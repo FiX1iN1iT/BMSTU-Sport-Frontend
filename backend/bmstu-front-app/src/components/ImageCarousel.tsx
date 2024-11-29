@@ -1,8 +1,8 @@
 import Carousel from 'react-bootstrap/Carousel';
 import './ImageCarousel.css';
-import defaultImage1 from '../pages/1.png'
-import defaultImage2 from '../pages/2.png'
-import defaultImage3 from '../pages/3.png'
+import defaultImage1 from '../assets/1.png'
+import defaultImage2 from '../assets/2.png'
+import defaultImage3 from '../assets/3.png'
 
 function ImageCarousel() {
   return (

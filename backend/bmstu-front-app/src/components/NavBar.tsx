@@ -6,8 +6,6 @@ function NavigationBar() {
     <Navbar bg="danger" data-bs-theme="dark">
         <Navbar.Brand href="/">BMSTU Sport</Navbar.Brand>
 
-        {/* <Nav className="me-auto"></Nav> */}
-
         <Nav>
             <Nav.Item>
                 <Nav.Link href="/sections">Секции</Nav.Link>

@@ -35,7 +35,6 @@ const ApplicationPage: FC = () => {
     const handleArrowClick = (id: number) => {
         if (pageData) {
             higherPriority(pageData.application.pk, id)
-            // navigate(`${ROUTES.APPLICATIONS}/${pageData.application.pk}`)
             window.location.reload();
         }
     };

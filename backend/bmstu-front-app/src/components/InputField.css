@@ -3,18 +3,8 @@
     padding: 12px 0;
 }
 
-/* .inputField > input {
-    width: 200px;
-    margin-right: 12px;
-    border: 2px solid black;
-    border-radius: 4px;
-    outline: none;
-} */
-
 .inputField > input {
-    /* margin-top: 37px; */
     margin-right: 25px;
-    /* margin-bottom: 50px; */
     padding-top: 16px;
     padding-bottom: 16px;
     padding-left: 28px;
@@ -24,16 +14,3 @@
     border: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-/* .inputField {
-    margin-top: 37px;
-    margin-left: 50px;
-    margin-bottom: 50px;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 28px;
-    padding-right: 584px;
-    border-radius: 16px;
-    border: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-} */

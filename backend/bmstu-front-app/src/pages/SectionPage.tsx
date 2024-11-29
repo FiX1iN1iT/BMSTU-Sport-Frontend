@@ -5,7 +5,7 @@ import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { useParams } from "react-router-dom";
 import { Section, getSection } from "../modules/bmstuSportApi";
 import { Spinner, Image } from "react-bootstrap";
-import defaultImage from "./default_image.png";
+import defaultImage from "../assets/default_image.png";
 import { SECTION_MOCK } from "../modules/mocks";
 import { DateDisplay } from '../helpers/DateDisplay';
 import NavigationBar from "../components/NavBar";
@@ -34,30 +34,10 @@ export const AlbumPage: FC = () => {
         ]}
       />
       {pageData ? ( // проверка на наличие данных, иначе загрузка
-        // <div className="container">
-        //   <Row>
-        //     <Col md={6}>
-        //       <p>
-        //         Секция: <strong>{pageData.title}</strong>
-        //       </p>
-        //       <p>
-        //         Инструктор: <strong>{pageData.instructor}</strong>
-        //       </p>
-        //     </Col>
-        //     <Col md={6}>
-        //       <Image
-        //         src={pageData.imageUrl || defaultImage} // дефолтное изображение, если нет imageUrl
-        //         alt="Картинка"
-        //         width={100}
-        //       />
-        //     </Col>
-        //   </Row>
-        // </div>
-
         <div className="section">
           <Image
             className="image"
-            src={pageData.imageUrl || defaultImage} // Default image if none is provided
+            src={pageData.imageUrl || defaultImage}
             alt="Image"
           />
           <div className="title">{pageData.title}</div>
@@ -84,7 +64,7 @@ export const AlbumPage: FC = () => {
           </div>
         </div>
       ) : (
-        <div className="album_page_loader_block">{/* загрузка */}
+        <div className="album_page_loader_block">
           <Spinner animation="border" />
         </div>
       )}
