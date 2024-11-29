@@ -1,0 +1,51 @@
+.album_page_loader_block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  /* section */
+
+.section {
+    margin-top: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.section .image {
+    height: 400px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.section .title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: bolder;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.section .content-header {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.section .content {
+    margin-bottom: 10px;
+    display: flex;
+    width: 100%;
+}
+
+.section .content-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.section .content-value {
+    font-size: 20px;
+}
+
+/* section */
