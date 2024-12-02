@@ -5,8 +5,21 @@ import { HomePage } from "./pages/HomePage";
 import SectionsPage from "./pages/SectionsPage";
 import { ROUTES } from "./Routes";
 import ApplicationPage from "./pages/ApplicationPage";
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect } from "react";
 
 function App() {
+    useEffect(()=>{
+        invoke('tauri', {cmd:'create'})
+          .then(() =>{console.log("Tauri launched")})
+          .catch(() =>{console.log("Tauri not launched")})
+        return () =>{
+          invoke('tauri', {cmd:'close'})
+            .then(() =>{console.log("Tauri launched")})
+            .catch(() =>{console.log("Tauri not launched")})
+        }
+      }, [])
+
   return (
     <BrowserRouter basename="/BMSTU-Sport-Frontend">
       <Routes>

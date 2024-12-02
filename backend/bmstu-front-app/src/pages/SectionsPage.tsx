@@ -36,24 +36,24 @@ const SectionsPage: FC = () => {
         });
   }, [searchValue])
 
-  const handleSearch = () => {
-    setLoading(true);
-    getSections(searchValue)
-      .then((response) => {
-        setSections(response.sections);
-        setLoading(false);
-      })
-      .catch(() => { // В случае ошибки используем mock данные, фильтруем по имени
-        setSections(
-            SECTIONS_MOCK.sections.filter((item) =>
-            item.title
-              .toLocaleLowerCase()
-              .startsWith(searchValue.toLocaleLowerCase())
-          )
-        );
-        setLoading(false);
-      });
-  };
+//   const handleSearch = () => {
+//     setLoading(true);
+//     getSections(searchValue)
+//       .then((response) => {
+//         setSections(response.sections);
+//         setLoading(false);
+//       })
+//       .catch(() => { // В случае ошибки используем mock данные, фильтруем по имени
+//         setSections(
+//             SECTIONS_MOCK.sections.filter((item) =>
+//             item.title
+//               .toLocaleLowerCase()
+//               .startsWith(searchValue.toLocaleLowerCase())
+//           )
+//         );
+//         setLoading(false);
+//       });
+//   };
 //   const handleSearchSubmit = (searchValue: string) => {
 //     setSearchValue(searchValue);
 //     handleSearch();
