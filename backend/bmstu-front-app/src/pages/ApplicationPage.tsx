@@ -98,7 +98,6 @@ const ApplicationPage: FC = () => {
                 <Col key={index} xs={12}>
                   <ApplicationRow
                       key={item.pk}
-                      sectionId={item.pk}
                       imageUrl={item.imageUrl}
                       title={item.title}
                       location={item.location}

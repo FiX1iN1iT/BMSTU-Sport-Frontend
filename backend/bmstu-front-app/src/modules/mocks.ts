@@ -5,10 +5,10 @@ export const SECTION_MOCK: Section = {
     title: "mock-Футбол",
     description: "У этой секции нет описания",
     location: "СК МГТУ",
-    date: "2024-10-22",
+    date: "2024-12-01",
     instructor: "Петров Петр Петрович",
     duration: 90,
-    imageUrl: "http://127.0.0.1:9000/bmstu-sport/1.png"
+    imageUrl: ""
 };
 
 export const SECTIONS_MOCK: SectionsResult = {
@@ -21,7 +21,7 @@ export const SECTIONS_MOCK: SectionsResult = {
             date: "2024-10-22",
             instructor: "Петров Петр Петрович",
             duration: 90,
-            imageUrl: "http://127.0.0.1:9000/bmstu-sport/1.png"
+            imageUrl: ""
         },
         {
             pk: 1,
@@ -31,7 +31,7 @@ export const SECTIONS_MOCK: SectionsResult = {
             date: "2024-10-22",
             instructor: "Петров Петр Петрович",
             duration: 90,
-            imageUrl: "http://127.0.0.1:9000/bmstu-sport/3.png"
+            imageUrl: ""
         }
     ],
     number_of_sections: 0,

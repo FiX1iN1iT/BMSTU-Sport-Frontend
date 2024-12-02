@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import './SectionCard.css';
 import { DateDisplay } from '../helpers/DateDisplay';
+import defaultImage from "../assets/default_image.png";
 
 interface SectionCardProps {
     sectionId: number;
@@ -35,14 +36,13 @@ export const SectionCard: FC<SectionCardProps> = ({
             <Card.Img
                 className="card-image"
                 variant="top"
-                src={imageUrl}
+                src={imageUrl || defaultImage}
                 alt="Картинка"
                 onClick={imageClickHandler}
             />
             <Card.Body>
                 <Card.Title>
                     <div className="card-title">{title}</div>
-                    {/* <a href={`/section/${sectionId}`}>{title}</a> */}
                 </Card.Title>
                 <div className="card-location">{location}</div>
                 <div className="card-date">

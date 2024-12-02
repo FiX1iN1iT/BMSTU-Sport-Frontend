@@ -27,14 +27,14 @@ export const AlbumPage: FC = () => {
   return (
     <div>
       <NavigationBar/>
-      <BreadCrumbs
+      {pageData ? ( // проверка на наличие данных, иначе загрузка
+        <div className="section">
+            <BreadCrumbs
         crumbs={[
           { label: ROUTE_LABELS.SECTIONS, path: ROUTES.SECTIONS },
           { label: pageData?.title || "Секция" },
         ]}
       />
-      {pageData ? ( // проверка на наличие данных, иначе загрузка
-        <div className="section">
           <Image
             className="image"
             src={pageData.imageUrl || defaultImage}

@@ -8,7 +8,7 @@ import ApplicationPage from "./pages/ApplicationPage";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/BMSTU-Sport-Frontend">
       <Routes>
         <Route path={ROUTES.HOME} index element={<HomePage />} />
         <Route path={ROUTES.SECTIONS} element={<SectionsPage />} />

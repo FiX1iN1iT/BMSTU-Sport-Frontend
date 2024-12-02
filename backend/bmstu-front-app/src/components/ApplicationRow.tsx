@@ -2,9 +2,9 @@ import { FC } from 'react';
 import { Image, Button } from 'react-bootstrap';
 import './ApplicationRow.css';
 import { DateDisplay } from '../helpers/DateDisplay';
+import defaultImage from "../assets/default_image.png";
 
 interface ApplicationRowProps {
-    sectionId: number;
     imageUrl: string;
     title: string;
     location: string;
@@ -16,7 +16,6 @@ interface ApplicationRowProps {
 }
 
 export const ApplicationRow: FC<ApplicationRowProps> = ({
-    sectionId,
     imageUrl,
     title,
     location,
@@ -31,7 +30,7 @@ export const ApplicationRow: FC<ApplicationRowProps> = ({
         <div className="application-cell">
             <Image
                 className="image"
-                src={imageUrl}
+                src={imageUrl || defaultImage}
                 alt="Картинка"
                 onClick={imageClickHandler}
             />

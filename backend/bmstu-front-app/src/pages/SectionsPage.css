@@ -1,8 +1,5 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px 40px;
-    min-width: 800px;
+.cccontainer {
+    margin: 20px;
 }
 .containerLoading {
     filter: blur(8px);
@@ -16,9 +13,9 @@
 
 /* button */
 
-.button-container {
+.btncontainer {
     position: relative;
-    margin-left: 45px;
+    margin: 10px 0;
 }
 
 .button {
@@ -57,7 +54,9 @@
 
 .horizontal-container {
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /* horizontal-container */
