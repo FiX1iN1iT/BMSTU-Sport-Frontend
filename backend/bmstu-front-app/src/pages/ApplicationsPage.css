@@ -1,0 +1,29 @@
+/* top-container */
+
+.top-container {
+    margin-left: 50px;
+    margin-right: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-container .title {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* top-container */
+
+/* applications-table */
+
+.table-container {
+    width: 80%;
+    margin: auto;
+}
+
+/* .applications-table {
+    width: 80%;
+} */
+
+/* applications-table */
