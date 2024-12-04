@@ -7,6 +7,10 @@ interface DateDisplayProps {
 export const DateDisplay: React.FC<DateDisplayProps> = ({ dateString }) => {
   const date = new Date(dateString);
 
+  if (isNaN(date.getTime())) {
+    return <div>--</div>
+  }
+
   const formattedDate = date.toLocaleDateString('ru-RU', {
     month: 'short',
     day: 'numeric',

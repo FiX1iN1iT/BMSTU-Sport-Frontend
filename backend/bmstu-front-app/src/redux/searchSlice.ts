@@ -13,7 +13,7 @@ const loadSearchValueFromLocalStorage = () => {
     localStorage.setItem('search', JSON.stringify(searchState));
   };
   
-  const initialState: SearchState = loadSearchValueFromLocalStorage(); // Загрузка из localStorage
+  const initialState: SearchState = loadSearchValueFromLocalStorage();
   
   const searchSlice = createSlice({
     name: 'search',
@@ -21,7 +21,7 @@ const loadSearchValueFromLocalStorage = () => {
     reducers: {
         setSearchValue(state, action: PayloadAction<string>) {
         state.searchValue = action.payload;
-        saveSearchValuesToLocalStorage(state); // Сохранение в localStorage
+        saveSearchValuesToLocalStorage(state);
       },
       resetSearch(state) {
         state.searchValue = '';

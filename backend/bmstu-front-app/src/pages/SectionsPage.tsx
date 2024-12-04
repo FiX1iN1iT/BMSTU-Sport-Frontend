@@ -1,33 +1,50 @@
 import "./SectionsPage.css";
 import { FC, useEffect, useState } from "react";
 import { Button, Col, Row, Spinner, Badge } from "react-bootstrap";
-import { Section, getSections } from "../modules/bmstuSportApi";
-import SearchField from "../components/SearchField";
 import { SearchComponent } from "../components/SearchComponent";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { SectionCard } from "../components/SectionCard";
 import { useNavigate } from "react-router-dom";
 import { SECTIONS_MOCK } from "../modules/mocks";
-import NavigationBar from "../components/NavBar";
-import { useSelector } from "react-redux";
+import { NavigationBar } from "../components/NavBar";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { logout } from "../redux/authSlice";
+import { api } from '../api';
+import { Section } from '../api/Api';
 
 const SectionsPage: FC = () => {
-//   const [searchValue, setSearchValue] = useState("");
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
   const searchValue = useSelector((state: RootState) => state.search.searchValue);
   const [loading, setLoading] = useState(false);
   const [sections, setSections] = useState<Section[]>([]);
   const [applicationSectionsCounter, setApplicationSectionsCounter] = useState(0);
+  const [draftApplicationID, setDraftApplicationID] = useState(0);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true)
-    getSections(searchValue)
+    api.sections.sectionsList({section_title: searchValue})
         .then((response) => {
-            setSections(response.sections);
-            setApplicationSectionsCounter(response.number_of_sections);
+            const data = response.data;
+
+            if (data && data.sections) {
+                const sectionsData = data.sections as Section[];
+
+                setSections(sectionsData);
+            }
+
+            if (data && data.draft_application_id && data.number_of_sections) {
+                const numberOfSectionsData = data.number_of_sections as number;
+                const draftApplicationIDData = data.draft_application_id as number;
+
+                setApplicationSectionsCounter(numberOfSectionsData);
+                setDraftApplicationID(draftApplicationIDData);
+            }
+
             setLoading(false);
         })
         .catch(() => {
@@ -36,54 +53,46 @@ const SectionsPage: FC = () => {
         });
   }, [searchValue])
 
-  const handleSearch = () => {
-    setLoading(true);
-    getSections(searchValue)
-      .then((response) => {
-        setSections(response.sections);
-        setLoading(false);
-      })
-      .catch(() => { // В случае ошибки используем mock данные, фильтруем по имени
-        setSections(
-            SECTIONS_MOCK.sections.filter((item) =>
-            item.title
-              .toLocaleLowerCase()
-              .startsWith(searchValue.toLocaleLowerCase())
-          )
-        );
-        setLoading(false);
-      });
-  };
-//   const handleSearchSubmit = (searchValue: string) => {
-//     setSearchValue(searchValue);
-//     handleSearch();
-//   };
-//   const handleSearchSubmitV2 = (searchValue: string) => {
-//     setSearchValue(searchValue);
-//   };
-  const handleCardClick = (id: number) => {
-    navigate(`${ROUTES.SECTIONS}/${id}`);
+  const handleCardClick = (id: number | undefined) => {
+    if (id) {
+        navigate(`${ROUTES.SECTIONS}/${id}`);
+    }
   };
 
   const handleApplicationButtonClick = () => {
-    // должно появится в будующих лабах
-    // navigate(`${ROUTES.APPLICATIONS}/${draftApplicationID}`);
+    navigate(`${ROUTES.APPLICATIONS}/${draftApplicationID}`);
   };
 
-  const handleAddSection = (sectionId: number) => {
+  const handleAddSection = (sectionId: number | undefined) => {
     console.log(sectionId)
-    // должно появится в будующих лабах
-    // addSectionToDraft(sectionId)
-    //     .then((ok) => {
-    //         if (ok) {
-    //             setApplicationSectionsCounter(applicationSectionsCounter + 1);
-    //         }
-    //     })
+    
+    if (sectionId) {
+        api.applications.applicationsDraftCreate({section_id: sectionId})
+            .then((response) => {
+                const data = response.data;
+
+                if (data && data.draft_application_id) {
+                    const draftApplicationIDData = data.draft_application_id as number;
+
+                    setApplicationSectionsCounter(applicationSectionsCounter + 1);
+                    setDraftApplicationID(draftApplicationIDData);
+                }
+            })
+    }
+  }
+
+  const onLogout = () => {
+    dispatch(logout());
+    navigate(ROUTES.HOME);
   }
 
   return (
     <div>
-        <NavigationBar/>
+        <NavigationBar
+            isAuthenticated={isAuthenticated}
+            username={user.username}
+            handleLogout={onLogout}
+        />
     <div className="cccontainer">
         <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.SECTIONS }]} />
       
@@ -92,16 +101,7 @@ const SectionsPage: FC = () => {
         </div>
 
         <div className="horizontal-container">
-            {/* <SearchField
-                value={searchValue}
-                setValue={(value) => setSearchValue(value)}
-                loading={loading}
-                placeholder="Поиск по названию"
-                onSubmit={handleSearch}
-            /> */}
-            <SearchComponent
-                // onSearchValueChange={handleSearchSubmitV2}
-            />
+            <SearchComponent/>
 
             <div className="btncontainer">
                 {applicationSectionsCounter > 0 ? (
@@ -109,18 +109,18 @@ const SectionsPage: FC = () => {
                         ЗАЯВКА <Badge bg="danger">{applicationSectionsCounter}</Badge>
                     </Button>
                 ) : (
-                    <Button variant="secondary">ЗАЯВКА</Button> // disabled
+                    <Button variant="secondary">ЗАЯВКА</Button> 
                 )}
             </div>
         </div>
 
-        {loading && ( // здесь можно было использовать тернарный оператор, но это усложняет читаемость
+        {loading && (
             <div className="loadingBg">
                 <Spinner animation="border" />
             </div>
         )}
         {!loading &&
-            (!sections.length /* Проверка на существование данных */ ? (
+            (!sections.length ? (
             <div>
                 <h1>Такого курса на этой неделе не будет</h1>
             </div>
@@ -130,11 +130,11 @@ const SectionsPage: FC = () => {
                     <Col xs={12} sm={6} md={4} lg={3} xl={3} key={index}>
                         <SectionCard
                             key={item.pk}
-                            sectionId={item.pk}
-                            imageUrl={item.imageUrl}
+                            sectionId={item.pk || 1}
+                            imageUrl={item.imageUrl || ''}
                             title={item.title}
-                            location={item.location}
-                            date={item.date}
+                            location={item.location || ''}
+                            date={item.date || ''}
                             plusButtonClickHandler={() => handleAddSection(item.pk)}
                             imageClickHandler={() => handleCardClick(item.pk)}
                         />
