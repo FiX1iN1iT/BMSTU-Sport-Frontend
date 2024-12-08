@@ -1,5 +1,4 @@
-# BMSTU Sport
-### Запись на спортивные курсы МГТУ
+# BMSTU Sport – запись на спортивные курсы МГТУ
 
 <p align="center">
   <img src="backend\bmstu-front-app\public\ios\AppIcon~ios-marketing.png"  width="200" />
