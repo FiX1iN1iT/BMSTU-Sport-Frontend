@@ -8,9 +8,10 @@ import { SectionCard } from "../components/SectionCard";
 import { useNavigate } from "react-router-dom";
 import { SECTIONS_MOCK } from "../modules/mocks";
 import { NavigationBar } from "../components/NavBar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { logout } from "../redux/authSlice";
+import { logoutUser } from "../redux/authSlice";
+import { useAppDispatch } from '../redux/store';
 import { api } from '../api';
 import { Section } from '../api/Api';
 
@@ -22,11 +23,11 @@ const SectionsPage: FC = () => {
   const [applicationSectionsCounter, setApplicationSectionsCounter] = useState(0);
   const [draftApplicationID, setDraftApplicationID] = useState(0);
 
-  const dispatch = useDispatch();
+  const authDispatch = useAppDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     api.sections.sectionsList({section_title: searchValue})
         .then((response) => {
             const data = response.data;
@@ -81,17 +82,27 @@ const SectionsPage: FC = () => {
     }
   }
 
-  const onLogout = () => {
-    dispatch(logout());
-    navigate(ROUTES.HOME);
-  }
+//   const onLogout = () => {
+//     dispatch(logout());
+//     navigate(ROUTES.HOME);
+//   }
+
+  const handleLogout = async () => {
+    try {
+      await authDispatch(logoutUser()).unwrap();
+
+      navigate(ROUTES.HOME);
+    } catch (error) {
+      console.error('Ошибка деавторизации:', error);
+    }
+  };
 
   return (
     <div>
         <NavigationBar
             isAuthenticated={isAuthenticated}
             username={user.username}
-            handleLogout={onLogout}
+            handleLogout={handleLogout}
         />
     <div className="cccontainer">
         <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.SECTIONS }]} />
@@ -121,27 +132,29 @@ const SectionsPage: FC = () => {
         )}
         {!loading &&
             (!sections.length ? (
-            <div>
-                <h1>Такого курса на этой неделе не будет</h1>
-            </div>
+                <div>
+                    <h1>Такого курса на этой неделе не будет</h1>
+                </div>
             ) : (
-            <Row className="g-4">
-                {sections.map((item, index) => (
-                    <Col xs={12} sm={6} md={4} lg={3} xl={3} key={index}>
-                        <SectionCard
-                            key={item.pk}
-                            sectionId={item.pk || 1}
-                            imageUrl={item.imageUrl || ''}
-                            title={item.title}
-                            location={item.location || ''}
-                            date={item.date || ''}
-                            plusButtonClickHandler={() => handleAddSection(item.pk)}
-                            imageClickHandler={() => handleCardClick(item.pk)}
-                        />
-                    </Col>
-                ))}
-            </Row>
-        ))}
+                <Row className="g-4">
+                    {sections.map((item, index) => (
+                        <Col xs={12} sm={6} md={4} lg={3} xl={3} key={index}>
+                            <SectionCard
+                                key={item.pk}
+                                sectionId={item.pk || 1}
+                                imageUrl={item.imageUrl || ''}
+                                title={item.title}
+                                location={item.location || ''}
+                                date={item.date || ''}
+                                plusButtonClickHandler={() => handleAddSection(item.pk)}
+                                imageClickHandler={() => handleCardClick(item.pk)}
+                            />
+                        </Col>
+                    ))}
+                </Row>
+            )
+            )
+        }
     </div>
     </div>
   );

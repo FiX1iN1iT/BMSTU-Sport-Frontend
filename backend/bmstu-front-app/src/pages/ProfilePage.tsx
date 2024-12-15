@@ -13,6 +13,7 @@ const ProfilePage: FC = () => {
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 

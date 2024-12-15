@@ -401,7 +401,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     applicationsList: (
       query?: {
         status?: string;
-        apply_date?: string;
+        start_apply_date?: string;
+        end_apply_date?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -572,7 +573,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     applicationsPriorityUpdate: (applicationId: string, sectionId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+        this.request<
+    {
+      application?: {
+        pk?: number;
+        status?: string;
+        creation_date?: string;
+        apply_date?: string;
+        end_date?: string;
+        creator?: string;
+        moderator?: number;
+        full_name?: string;
+        number_of_sections?: string;
+      };
+      sections?: {
+        pk?: number;
+        title?: string;
+        description?: string;
+        location?: string;
+        date?: string;
+        instructor?: string;
+        duration?: number;
+        imageUrl?: string;
+      }[];
+    },
+    any
+  >({
         path: `/applications/${applicationId}/priority/${sectionId}`,
         method: "PUT",
         secure: true,
@@ -589,7 +615,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     applicationsPriorityDelete: (applicationId: string, sectionId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+        this.request<
+    {
+      application?: {
+        pk?: number;
+        status?: string;
+        creation_date?: string;
+        apply_date?: string;
+        end_date?: string;
+        creator?: string;
+        moderator?: number;
+        full_name?: string;
+        number_of_sections?: string;
+      };
+      sections?: {
+        pk?: number;
+        title?: string;
+        description?: string;
+        location?: string;
+        date?: string;
+        instructor?: string;
+        duration?: number;
+        imageUrl?: string;
+      }[];
+    },
+    any
+  >({
         path: `/applications/${applicationId}/priority/${sectionId}`,
         method: "DELETE",
         secure: true,

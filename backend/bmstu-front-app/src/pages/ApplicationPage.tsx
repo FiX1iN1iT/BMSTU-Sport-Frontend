@@ -1,31 +1,34 @@
 import "./ApplicationPage.css";
 import { FC, useEffect, useState } from "react";
-import { Button, Col, Row } from "react-bootstrap";
-// import { ApplicationResult, getApplication, editApplication, deleteApplication, higherPriority, submitApplication, deletePriority } from "../modules/bmstuSportApi";
+import { Button, Col, Row, Spinner } from "react-bootstrap";
 import InputField from "../components/InputField";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { useNavigate, useParams } from "react-router-dom";
 import { ApplicationRow } from "../components/ApplicationRow";
 import { NavigationBar } from "../components/NavBar";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../redux/authSlice";
+import { useSelector } from "react-redux";
+import { logoutUser } from "../redux/authSlice";
+import { useAppDispatch } from '../redux/store';
 import { api } from '../api';
 import { SportApplication, Section } from '../api/Api';
 
 const ApplicationPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+    const [loading, setLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [application, setApplication] = useState<SportApplication>();
     const [sections, setSections] = useState<Section[]>();
     const [fullName, setFullName] = useState("");
   
-    const dispatch = useDispatch();
+    const authDispatch = useAppDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
 
     useEffect(() => {
         if (!id) return;
+
+        setLoading(true);
         api.applications.applicationsRead(id)
           .then((response) => {
             const data = response.data;
@@ -47,9 +50,12 @@ const ApplicationPage: FC = () => {
             } else {
                 setIsError(true);
             }
+
+            setLoading(false);
           })
           .catch(() => {
             setIsError(true);
+            setLoading(false);
           });
       }, [id]);
   
@@ -64,9 +70,28 @@ const ApplicationPage: FC = () => {
             const applicationNumberString = String(application.pk);
             const idString = String(id);
 
-            api.applications.applicationsPriorityUpdate(applicationNumberString, idString);
-            // higherPriority(application.pk, id)
-            window.location.reload();
+            setLoading(true);
+            api.applications.applicationsPriorityUpdate(applicationNumberString, idString)
+                .then((response) => {
+                    const data = response.data;
+        
+                    if (data.application?.creator != user.username) {
+                        setIsError(true);
+                    }
+        
+                    if (data.sections) {
+                        const sectionsData = data.sections as Section[];
+                        setSections(sectionsData);
+                    } else {
+                        setIsError(true);
+                    }
+        
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setIsError(true);
+                    setLoading(false);
+                });
         } else {
             alert('Изменение этой заявки невозможно');
         }
@@ -77,9 +102,28 @@ const ApplicationPage: FC = () => {
             const applicationNumberString = String(application.pk);
             const idString = String(id);
 
-            api.applications.applicationsPriorityDelete(applicationNumberString, idString);
-            // deletePriority(application.pk, id)
-            window.location.reload();
+            setLoading(true);
+            api.applications.applicationsPriorityDelete(applicationNumberString, idString)
+                .then((response) => {
+                    const data = response.data;
+        
+                    if (data.application?.creator != user.username) {
+                        setIsError(true);
+                    }
+        
+                    if (data.sections) {
+                        const sectionsData = data.sections as Section[];
+                        setSections(sectionsData);
+                    } else {
+                        setIsError(true);
+                    }
+        
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setIsError(true);
+                    setLoading(false);
+                });
         } else {
             alert('Изменение этой заявки невозможно');
         }
@@ -92,7 +136,6 @@ const ApplicationPage: FC = () => {
             let updatedApplication = application;
             updatedApplication.full_name = fullName;
             api.applications.applicationsUpdate(applicationNumberString, updatedApplication);
-            // editApplication(application.pk, fullName)
         } else {
             alert('Изменение этой заявки невозможно');
         }
@@ -103,7 +146,7 @@ const ApplicationPage: FC = () => {
             const applicationNumberString = String(application.pk);
 
             api.applications.applicationsDelete(applicationNumberString);
-            // deleteApplication(application.pk)
+
             navigate(ROUTES.APPLICATIONS);
         } else {
             alert('Изменение этой заявки невозможно');
@@ -115,76 +158,88 @@ const ApplicationPage: FC = () => {
             const applicationNumberString = String(application.pk);
 
             api.applications.applicationsSubmitUpdate(applicationNumberString);
-            // submitApplication(application.pk)
+
             navigate(ROUTES.APPLICATIONS);
         } else {
             alert('Изменение этой заявки невозможно');
         }
     };
 
-    const onLogout = () => {
-        dispatch(logout());
-        navigate(ROUTES.HOME);
-    }
+    const handleLogout = async () => {
+        try {
+          await authDispatch(logoutUser()).unwrap();
+    
+          navigate(ROUTES.HOME);
+        } catch (error) {
+          console.error('Ошибка деавторизации:', error);
+        }
+      };
   
     return (
-        <div className="container">
+        <div>
             <NavigationBar
                 isAuthenticated={isAuthenticated}
                 username={user.username}
-                handleLogout={onLogout}
+                handleLogout={handleLogout}
             />
 
-            {!isError ? (
-                <>
-            <BreadCrumbs
-                crumbs={[
-                    { label: ROUTE_LABELS.APPLICATIONS, path: ROUTES.APPLICATIONS },
-                    { label: `Заявка #${id}` },
-                ]}
-             />
-        
-            <div className="top-container">
-                <div className="title"></div>
-  
-                <div className="horizontal-container">
-                    <Button variant="primary" onClick={handleSubmitButtonClick}>Сформировать заявку</Button>
-                    <Button variant="danger" onClick={handleDeleteButtonClick}>Удалить заявку</Button>
-                </div>
+            <div className="container">
+                {loading && (
+                    <div className="loadingBg">
+                        <Spinner animation="border" />
+                    </div>
+                )}
+                {!loading && !isError ? (
+                    <>
+                        <BreadCrumbs
+                            crumbs={[
+                                { label: ROUTE_LABELS.APPLICATIONS, path: ROUTES.APPLICATIONS },
+                                { label: `Заявка #${id}` },
+                            ]}
+                        />
+            
+                        <div className="top-container">
+                            <div className="title"></div>
+            
+                            <div className="horizontal-container">
+                                <Button variant="primary" onClick={handleSubmitButtonClick}>Сформировать заявку</Button>
+                                <Button variant="danger" onClick={handleDeleteButtonClick}>Удалить заявку</Button>
+                            </div>
+                        </div>
+
+                        <InputField
+                            value={fullName || ""}
+                            setValue={(value) => setFullName(value)}
+                            placeholder="Введите ФИО"
+                            onSubmit={handleFieldSubmit}
+                        />
+
+                        {sections?.length ? (
+                            <Row className="g-4">
+                                {sections.map((item, index) => (
+                                    <Col key={index} xs={12}>
+                                        <ApplicationRow
+                                            key={item.pk}
+                                            imageUrl={item.imageUrl || ''}
+                                            title={item.title}
+                                            location={item.location || ''}
+                                            date={item.date || ''}
+                                            position={index + 1}
+                                            imageClickHandler={() => handleCardClick(item.pk)}
+                                            handleArrowClick={() => handleArrowClick(item.pk)}
+                                            handleMinusClick={() => handleMinusClick(item.pk)}
+                                        />
+                                    </Col>
+                                ))}
+                            </Row>
+                        ) : (
+                            <div>Нет добавленных секций</div>
+                        )}
+                    </>
+                ) : (
+                    <div>Нет доступа к заявке с таким id</div>
+                )}
             </div>
-
-            <InputField
-                value={fullName || ""}
-                setValue={(value) => setFullName(value)}
-                placeholder="Введите ФИО"
-                onSubmit={handleFieldSubmit}
-            />
-
-            {sections?.length ? (
-                <Row className="g-4">
-                    {sections.map((item, index) => (
-                        <Col key={index} xs={12}>
-                            <ApplicationRow
-                                key={item.pk}
-                                imageUrl={item.imageUrl || ''}
-                                title={item.title}
-                                location={item.location || ''}
-                                date={item.date || ''}
-                                position={index + 1}
-                                imageClickHandler={() => handleCardClick(item.pk)}
-                                handleArrowClick={() => handleArrowClick(item.pk)}
-                                handleMinusClick={() => handleMinusClick(item.pk)}
-                            />
-                        </Col>
-                    ))}
-                </Row>
-            ) : (
-                <div>Нет добавленных секций</div>
-            )}
-            </>
-        ) : (
-            <div>Нет доступа к заявке с таким id</div>
-        )}
         </div>
     );
 };

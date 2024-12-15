@@ -1,40 +1,56 @@
 import "./ApplicationsPage.css";
 import { FC, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
-import { logout } from "../redux/authSlice";
+import { logoutUser } from "../redux/authSlice";
+import { useAppDispatch } from '../redux/store';
 import { NavigationBar } from "../components/NavBar";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { api } from '../api';
 import { SportApplication } from '../api/Api';
 import Table from 'react-bootstrap/Table';
 import { DateDisplay } from '../helpers/DateDisplay';
+import { Spinner } from "react-bootstrap";
 
 const ApplicationsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-    const [applications, setApplications] = useState<SportApplication[]>([]);
 
-    const dispatch = useDispatch();
+    const [applications, setApplications] = useState<SportApplication[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const [startDate, setStartDate] = useState<string>('');
+    const [endDate, setEndDate] = useState<string>('');
+    const [status, setStatus] = useState<string>('');
+
+    const authDispatch = useAppDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        api.applications.applicationsList()
+        setLoading(true)
+        api.applications.applicationsList({
+            start_apply_date: startDate,
+            end_apply_date: endDate,
+            status: status
+        })
             .then((response) => {
                 const data = response.data;
 
-                if (data && Array.isArray(data.applications)) {
-                    const applicationsData = data.applications as SportApplication[];
+                if (data && Array.isArray(data)) {
+                    const applicationsData = data as SportApplication[];
                     setApplications(applicationsData);
                 } else {
                     setApplications([]);
                 }
+
+                setLoading(false);
             })
             .catch((error) => {
                 console.error('Ошибка при загрузке данных:', error);
                 setApplications([]);
+                setLoading(false);
             })
-    }, [])
+    }, [startDate, endDate, status])
 
     const handleRowClick = (id: number | undefined) => {
         if (id) {
@@ -44,9 +60,23 @@ const ApplicationsPage: FC = () => {
         }
     }
 
-    const onLogout = () => {
-        dispatch(logout());
-        navigate(ROUTES.HOME);
+    const handleLogout = async () => {
+        try {
+            await authDispatch(logoutUser()).unwrap();
+        
+            navigate(ROUTES.HOME);
+        } catch (error) {
+            console.error('Ошибка деавторизации:', error);
+        }
+    };
+
+    const handleFilterChange = () => {
+        setStartDate((document.getElementById('start-date') as HTMLInputElement).value);
+        setEndDate((document.getElementById('end-date') as HTMLInputElement).value);
+    }
+
+    const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setStatus(event.target.value);
     }
 
     return(
@@ -54,7 +84,7 @@ const ApplicationsPage: FC = () => {
             <NavigationBar
                 isAuthenticated={isAuthenticated}
                 username={user.username}
-                handleLogout={onLogout}
+                handleLogout={handleLogout}
             />
 
             <div className="cccontainer">
@@ -65,40 +95,78 @@ const ApplicationsPage: FC = () => {
                 <div className="title">Заявки</div>
             </div>
 
-            { !applications.length ? (
-                <div>
-                    <h1>Заявок нет</h1>
-                </div>
-            ) : (
-                <div className="table-container">
-                    <Table responsive bordered>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Статус</th>
-                                <th>Дата создания</th>
-                                <th>Дата формирования</th>
-                                <th>Дата завершения</th>
-                                <th>ФИО</th>
-                                <th>Кол-во секций</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {applications.map((item, _) => (
-                                <tr key={item.pk} onClick={() => handleRowClick(item.pk)}>
-                                    <td>{item.pk}</td>
-                                    <td>{item.status}</td>
-                                    <td><DateDisplay dateString={item.creation_date || ''}/></td>
-                                    <td><DateDisplay dateString={item.apply_date || ''}/></td>
-                                    <td><DateDisplay dateString={item.end_date || ''}/></td>
-                                    <td>{item.full_name || '--'}</td>
-                                    <td>{item.number_of_sections || '--'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+            {/* <div className="filter-container">
+                <label>
+                    Начальная дата:
+                    <input
+                        type="date"
+                        id="start-date"
+                        value={startDate}
+                        onChange={handleFilterChange}
+                    />
+                </label>
+                <label>
+                    Конечная дата:
+                    <input
+                        type="date"
+                        id="end-date"
+                        value={endDate}
+                        onChange={handleFilterChange}
+                    />
+                </label>
+                <label>
+                    Статус:
+                    <select value={status} onChange={handleStatusChange}>
+                        <option value="">Все</option>
+                        <option value="created">Сформированные</option>
+                        <option value="completed">Завершенные</option>
+                        <option value="rejected">Отклоненные</option>
+                    </select>
+                </label>
+            </div> */}
+
+            {loading && (
+                <div className="loadingBg">
+                    <Spinner animation="border" />
                 </div>
             )}
+            {!loading && 
+                (!applications.length ? (
+                    <div>
+                        <h1>Заявок нет</h1>
+                    </div>
+                ) : (
+                    <div className="table-container">
+                        <Table responsive bordered>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Статус</th>
+                                    <th>Дата создания</th>
+                                    <th>Дата формирования</th>
+                                    <th>Дата завершения</th>
+                                    <th>ФИО</th>
+                                    <th>Кол-во секций</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {applications.map((item, _) => (
+                                    <tr key={item.pk} onClick={() => handleRowClick(item.pk)}>
+                                        <td>{item.pk}</td>
+                                        <td>{item.status}</td>
+                                        <td><DateDisplay dateString={item.creation_date || ''}/></td>
+                                        <td><DateDisplay dateString={item.apply_date || ''}/></td>
+                                        <td><DateDisplay dateString={item.end_date || ''}/></td>
+                                        <td>{item.full_name || '--'}</td>
+                                        <td>{item.number_of_sections || '--'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </div>
+                )
+                )
+            }
         </div>
     );
 };

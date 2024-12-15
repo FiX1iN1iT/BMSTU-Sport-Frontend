@@ -1,38 +1,47 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { api } from '../api';
 
 interface AuthState {
   isAuthenticated: boolean;
   user: { username: string | null; id: number | null };
 }
 
-const loadAuthStateFromLocalStorage = () => {
-    const authState = localStorage.getItem('auth');
-    return authState ? JSON.parse(authState) : { isAuthenticated: false, user: { username: null, id: null } };
-};
-  
-const saveAuthStateToLocalStorage = (authState: AuthState) => {
-    localStorage.setItem('auth', JSON.stringify(authState));
+const initialState: AuthState = {
+    isAuthenticated: false,
+    user: { username: null, id: null }
 };
 
-const initialState: AuthState = loadAuthStateFromLocalStorage();
+export const loginUser = createAsyncThunk(
+    'auth/login',
+    async ({ email, password }: { email: string; password: string }) => {
+        const response = await api.login.loginCreate({ email, password });
+        return { username: email, id: response.data.pk };
+    }
+);
+
+export const logoutUser = createAsyncThunk(
+    'auth/logout',
+    async () => {
+        const response = await api.logout.logoutCreate();
+        return {};
+    }
+);
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState,
-  reducers: {
-    login(state, action: PayloadAction<{ username: string; id: number }>) {
-      state.isAuthenticated = true;
-      state.user = action.payload;
-      saveAuthStateToLocalStorage(state)
-    },
-    logout(state) {
-      state.isAuthenticated = false;
-      state.user = { username: null, id: null };
-      saveAuthStateToLocalStorage(state)
-    },
-  },
+    name: 'auth',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(loginUser.fulfilled, (state, action: PayloadAction<{ username: string; id: number }>) => {
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.isAuthenticated = false;
+                state.user = { username: null, id: null };
+            })
+    }
 });
-
-export const { login, logout } = authSlice.actions;
 
 export default authSlice.reducer;

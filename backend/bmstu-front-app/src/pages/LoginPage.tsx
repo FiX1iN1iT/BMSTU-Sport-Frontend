@@ -1,40 +1,27 @@
 import { FC, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/authSlice';
+import { useAppDispatch } from '../redux/store';
+import { loginUser } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { ROUTES, ROUTE_LABELS } from '../Routes';
 import { BreadCrumbs } from '../components/BreadCrumbs';
-import { api } from '../api';
 
 const LoginPage: FC = () => {
   const [email, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      // Отправляем данные на сервер для авторизации
-      const response = await api.login.loginCreate({ email, password });
+      await dispatch(loginUser({ email, password })).unwrap();
 
-      // Запрос на получение id пользователя по username
-    //   const userResponse = await api.user.userGetIdByUsername(username);
-    //   console.log(response.data.pk)
-
-      const id = response.data.pk;
-
-      // Сохраняем id в Redux
-      dispatch(login({ username: email, id }));
-      navigate('/'); // Перенаправление на главную страницу
+      navigate('/');
     } catch (error) {
-      // Если ошибка, выводим в консоль
       console.error('Ошибка авторизации:', error);
     }
   };
-
-
-
 
   return (
     <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
