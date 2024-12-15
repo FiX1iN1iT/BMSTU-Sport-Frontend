@@ -9,9 +9,8 @@ import { NavigationBar } from "../components/NavBar";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { api } from '../api';
 import { SportApplication } from '../api/Api';
-import Table from 'react-bootstrap/Table';
 import { DateDisplay } from '../helpers/DateDisplay';
-import { Spinner } from "react-bootstrap";
+import { Container, Row, Spinner, Col } from "react-bootstrap";
 
 const ApplicationsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
@@ -137,32 +136,29 @@ const ApplicationsPage: FC = () => {
                     </div>
                 ) : (
                     <div className="table-container">
-                        <Table responsive bordered>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Статус</th>
-                                    <th>Дата создания</th>
-                                    <th>Дата формирования</th>
-                                    <th>Дата завершения</th>
-                                    <th>ФИО</th>
-                                    <th>Кол-во секций</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {applications.map((item, _) => (
-                                    <tr key={item.pk} onClick={() => handleRowClick(item.pk)}>
-                                        <td>{item.pk}</td>
-                                        <td>{item.status}</td>
-                                        <td><DateDisplay dateString={item.creation_date || ''}/></td>
-                                        <td><DateDisplay dateString={item.apply_date || ''}/></td>
-                                        <td><DateDisplay dateString={item.end_date || ''}/></td>
-                                        <td>{item.full_name || '--'}</td>
-                                        <td>{item.number_of_sections || '--'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                        <Container fluid>
+                            <Row>
+                                <Col>#</Col>
+                                <Col>Статус</Col>
+                                <Col>Дата создания</Col>
+                                <Col>Дата формирования</Col>
+                                <Col>Дата завершения</Col>
+                                <Col>ФИО</Col>
+                                <Col>Кол-во секций</Col>
+                            </Row>
+
+                            {applications.map((item, _) => (
+                                <Row key={item.pk} onClick={() => handleRowClick(item.pk)} className="my-2 custom-row align-items-center">
+                                    <Col>{item.pk}</Col>
+                                    <Col>{item.status}</Col>
+                                    <Col><DateDisplay dateString={item.creation_date || ''}/></Col>
+                                    <Col><DateDisplay dateString={item.apply_date || ''}/></Col>
+                                    <Col><DateDisplay dateString={item.end_date || ''}/></Col>
+                                    <Col>{item.full_name || '--'}</Col>
+                                    <Col>{item.number_of_sections || '--'}</Col>
+                                </Row>
+                            ))}
+                        </Container>
                     </div>
                 )
                 )
