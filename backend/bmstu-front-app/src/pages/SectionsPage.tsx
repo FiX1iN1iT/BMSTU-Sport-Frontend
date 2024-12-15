@@ -82,11 +82,6 @@ const SectionsPage: FC = () => {
     }
   }
 
-//   const onLogout = () => {
-//     dispatch(logout());
-//     navigate(ROUTES.HOME);
-//   }
-
   const handleLogout = async () => {
     try {
       await authDispatch(logoutUser()).unwrap();
