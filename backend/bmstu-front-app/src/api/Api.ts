@@ -39,7 +39,7 @@ export interface User {
 
 export interface SportApplication {
   /** ID */
-  pk?: number;
+  pk: number;
   /** Status */
   status?: "draft" | "deleted" | "created" | "completed" | "rejected";
   /**
@@ -62,7 +62,7 @@ export interface SportApplication {
    * @format email
    * @minLength 1
    */
-  creator?: string;
+  creator: string;
   /** Moderator */
   moderator?: string;
   /**
@@ -683,9 +683,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     ) =>
       this.request<
         {
-          pk: number,
+          pk: number;
           email: string;
           password: string;
+          is_staff: boolean;
+          is_superuser: boolean;
+          first_name: string;
+          last_name: string;
         },
         any
       >({
@@ -766,11 +770,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/sections/
      * @secure
      */
-    sectionsCreate: (params: RequestParams = {}) =>
-      this.request<void, any>({
+    sectionsCreate: (data: Section, params: RequestParams = {}) =>
+      this.request<Section, any>({
         path: `/sections/`,
         method: "POST",
         secure: true,
+        body: data,
         ...params,
       }),
 
@@ -837,11 +842,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/sections/{section_id}/upload_image/
      * @secure
      */
-    sectionsUploadImageCreate: (sectionId: string, params: RequestParams = {}) =>
+    sectionsUploadImageCreate: (sectionId: string, data: { image: File }, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/sections/${sectionId}/upload_image/`,
         method: "POST",
+        body: data,
         secure: true,
+        type: ContentType.FormData,
+        format: "json",
         ...params,
       }),
   };

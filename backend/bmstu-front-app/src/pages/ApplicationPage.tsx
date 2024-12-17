@@ -30,33 +30,38 @@ const ApplicationPage: FC = () => {
 
         setLoading(true);
         api.applications.applicationsRead(id)
-          .then((response) => {
-            const data = response.data;
+            .then((response) => {
+                const data = response.data;
 
-            if (data.application?.creator != user.username) {
-                setIsError(true);
-            }
-
-            if (data.application && data.sections) {
-                const applicationData = data.application as SportApplication;
-                const sectionsData = data.sections as Section[];
-
-                setApplication(applicationData);
-                setSections(sectionsData);
-                if (sectionsData.length == 0 && application?.status == 'draft') {
-                    navigate(ROUTES.APPLICATIONS);
+                if (data.application?.creator != user.username) {
+                    setIsError(true);
                 }
-                setFullName(applicationData.full_name || '');
-            } else {
-                setIsError(true);
-            }
 
-            setLoading(false);
-          })
-          .catch(() => {
-            setIsError(true);
-            setLoading(false);
-          });
+                if (data.application && data.sections) {
+                    const applicationData = data.application as SportApplication;
+                    const sectionsData = data.sections as Section[];
+
+                    setApplication(applicationData);
+                    setSections(sectionsData);
+                    if (sectionsData.length == 0 && application?.status == 'draft') {
+                        navigate(ROUTES.APPLICATIONS);
+                    }
+                    setFullName(applicationData.full_name || '');
+                } else {
+                    setIsError(true);
+                }
+
+                setLoading(false);
+            })
+            .catch((error) => {
+                switch (error.response.status) {
+                    case 403:
+                        navigate(ROUTES.FORBIDDEN);
+                    default:
+                        setIsError(true);
+                        setLoading(false);
+                }
+            });
       }, [id]);
   
     const handleCardClick = (id: number | undefined) => {

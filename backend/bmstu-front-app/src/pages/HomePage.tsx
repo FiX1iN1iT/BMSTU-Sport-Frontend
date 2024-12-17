@@ -24,6 +24,7 @@ export const HomePage: FC = () => {
             <NavigationBar
                 isAuthenticated={isAuthenticated}
                 username={user.username}
+                is_staff={user.is_staff}
                 handleLogout={handleLogout}
             />
 
