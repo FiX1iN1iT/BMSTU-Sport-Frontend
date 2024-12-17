@@ -33,7 +33,7 @@ const ApplicationPage: FC = () => {
             .then((response) => {
                 const data = response.data;
 
-                if (data.application?.creator != user.username) {
+                if (data.application?.creator != user.username && !user.is_staff) {
                     setIsError(true);
                 }
 
@@ -185,6 +185,7 @@ const ApplicationPage: FC = () => {
             <NavigationBar
                 isAuthenticated={isAuthenticated}
                 username={user.username}
+                is_staff={user.is_staff}
                 handleLogout={handleLogout}
             />
 
