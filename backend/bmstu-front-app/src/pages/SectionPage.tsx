@@ -53,10 +53,11 @@ export const AlbumPage: FC = () => {
             <NavigationBar
                 isAuthenticated={isAuthenticated}
                 username={user.username}
+                is_staff={user.is_staff}
                 handleLogout={handleLogout}
             />
 
-            {pageData ? ( // проверка на наличие данных, иначе загрузка
+            {pageData ? (
                 <div className="section">
                     <BreadCrumbs
                         crumbs={[

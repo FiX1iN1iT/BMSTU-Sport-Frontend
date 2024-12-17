@@ -5,6 +5,11 @@ export const ROUTES = {
     LOGIN: "/login",
 	REGISTER: "/register",
 	USER_DASHBOARD: "/account",
+
+    SECTIONSTABLE: "/sections-table",
+
+    NOT_FOUND: "*",
+    FORBIDDEN: "/forbidden",
 }
 export type RouteKeyType = keyof typeof ROUTES;
 export const ROUTE_LABELS: {[key in RouteKeyType]: string} = {
@@ -14,4 +19,9 @@ export const ROUTE_LABELS: {[key in RouteKeyType]: string} = {
     LOGIN: "Вход",
     REGISTER: "Регистрация",
     USER_DASHBOARD: "Профиль",
+
+    SECTIONSTABLE: "Модерация секций",
+
+    NOT_FOUND: "404",
+    FORBIDDEN: "403",
 };
