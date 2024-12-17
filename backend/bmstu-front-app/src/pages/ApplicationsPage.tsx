@@ -216,7 +216,6 @@ const ApplicationsPage: FC = () => {
                                 <Col>Дата завершения</Col>
                                 <Col>Создатель</Col>
                                 <Col>ФИО</Col>
-                                <Col>Кол-во секций</Col>
                             </Row>
 
                             {filteredApplications.map((item, _) => (
@@ -240,7 +239,6 @@ const ApplicationsPage: FC = () => {
                                     <Col><DateDisplay dateString={item.end_date || ''}/></Col>
                                     <Col>{item.creator}</Col>
                                     <Col>{item.full_name || '--'}</Col>
-                                    <Col>{item.number_of_sections || '--'}</Col>
                                 </Row>
                             ))}
                         </Container>
