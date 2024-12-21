@@ -13,7 +13,7 @@ interface Props {
 const InputField: FC<Props> = ({ value, setValue, placeholder, onSubmit, buttonTitle = 'Сохранить' }) => (
     <div className="inputField">
         <input value={value} placeholder={placeholder} onChange={(event => setValue(event.target.value))}/>
-        <Button variant="outline-primary" onClick={onSubmit}>{buttonTitle}</Button>
+        <Button variant="danger" onClick={onSubmit}>{buttonTitle}</Button>
     </div>
 )
 

@@ -115,7 +115,7 @@ const ProfilePage: FC = () => {
                     />
                 </Form.Group>
 
-                <Button variant="primary" onClick={handleProfileUpdate} className="w-100 mt-4">
+                <Button variant="danger" onClick={handleProfileUpdate} className="w-100 mt-4">
                     Обновить данные
                 </Button>
                 </Form>

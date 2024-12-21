@@ -1,9 +1,11 @@
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AlbumPage } from "./pages/SectionPage";
-import { HomePage } from "./pages/HomePage";
-import SectionsPage from "./pages/SectionsPage";
+
 import { ROUTES } from "./Routes";
+
+import HomePage from "./pages/HomePage";
+import SectionPage from "./pages/SectionPage";
+import SectionsPage from "./pages/SectionsPage";
 import ApplicationPage from "./pages/ApplicationPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import LoginPage from "./pages/LoginPage";
@@ -26,7 +28,7 @@ function App() {
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={ROUTES.USER_DASHBOARD} element={<ProfilePage />} />
         <Route path={ROUTES.SECTIONS} element={<SectionsPage />} />
-        <Route path={`${ROUTES.SECTIONS}/:id`} element={<AlbumPage />} />
+        <Route path={`${ROUTES.SECTIONS}/:id`} element={<SectionPage />} />
         <Route path={ROUTES.APPLICATIONS} element={<ApplicationsPage />} />
         <Route path={`${ROUTES.APPLICATIONS}/:id`} element={<ApplicationPage />} />
 

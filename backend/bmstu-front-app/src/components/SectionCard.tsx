@@ -30,7 +30,7 @@ export const SectionCard: FC<SectionCardProps> = ({
 
     return (
         <Card className="card">
-            <Button className="card-button" onClick={addSection}>
+            <Button className="card-button" variant='danger' onClick={addSection}>
                 +
             </Button>
             <Card.Img

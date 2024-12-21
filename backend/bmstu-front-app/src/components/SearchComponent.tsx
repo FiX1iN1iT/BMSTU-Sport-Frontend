@@ -4,14 +4,14 @@ import { RootState } from "../redux/store";
 import SearchField from './SearchField';
 
 export const SearchComponent = () => {
-  const dispatch = useDispatch();
-  const { searchValue } = useSelector((state: RootState) => state.search);
+    const dispatch = useDispatch();
+    const { searchValue } = useSelector((state: RootState) => state.search);
 
-  return (
-    <SearchField
-      value={searchValue}
-      setValue={(value) => dispatch(setSearchValue(value))}
-      placeholder="Поиск по названию"
-    />
-  );
+    return (
+        <SearchField
+        value={searchValue}
+        setValue={(value) => dispatch(setSearchValue(value))}
+        placeholder="Поиск по названию"
+        />
+    );
 };

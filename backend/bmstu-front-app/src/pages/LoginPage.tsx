@@ -55,7 +55,7 @@ const LoginPage: FC = () => {
                 />
               </Form.Group>
 
-              <Button variant="primary" onClick={handleLogin} className="w-100 mt-4">
+              <Button variant="danger" onClick={handleLogin} className="w-100 mt-4">
                 Войти
               </Button>
             </Form>

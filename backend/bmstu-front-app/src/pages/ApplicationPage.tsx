@@ -57,9 +57,11 @@ const ApplicationPage: FC = () => {
                 switch (error.response.status) {
                     case 403:
                         navigate(ROUTES.FORBIDDEN);
+                        break;
                     default:
                         setIsError(true);
                         setLoading(false);
+                        break;
                 }
             });
       }, [id]);
@@ -189,6 +191,15 @@ const ApplicationPage: FC = () => {
                 handleLogout={handleLogout}
             />
 
+            <div className="application-page-breadcrumbs-container">
+                <BreadCrumbs
+                    crumbs={[
+                        { label: ROUTE_LABELS.APPLICATIONS, path: ROUTES.APPLICATIONS },
+                        { label: `Заявка #${id}` },
+                    ]}
+                />
+            </div>
+
             <div className="container">
                 {loading && (
                     <div className="loadingBg">
@@ -197,22 +208,6 @@ const ApplicationPage: FC = () => {
                 )}
                 {!loading && !isError ? (
                     <>
-                        <BreadCrumbs
-                            crumbs={[
-                                { label: ROUTE_LABELS.APPLICATIONS, path: ROUTES.APPLICATIONS },
-                                { label: `Заявка #${id}` },
-                            ]}
-                        />
-            
-                        <div className="top-container">
-                            <div className="title"></div>
-            
-                            <div className="horizontal-container">
-                                <Button variant="primary" onClick={handleSubmitButtonClick}>Сформировать заявку</Button>
-                                <Button variant="danger" onClick={handleDeleteButtonClick}>Удалить заявку</Button>
-                            </div>
-                        </div>
-
                         <InputField
                             value={fullName || ""}
                             setValue={(value) => setFullName(value)}
@@ -245,6 +240,11 @@ const ApplicationPage: FC = () => {
                 ) : (
                     <div>Нет доступа к заявке с таким id</div>
                 )}
+
+                <div className="application-page-horizontal-container">
+                    <Button variant="danger" onClick={handleSubmitButtonClick}>Сформировать заявку</Button>
+                    <Button variant="outline-danger" onClick={handleDeleteButtonClick}>Удалить заявку</Button>
+                </div>
             </div>
         </div>
     );

@@ -41,7 +41,7 @@ const RegisterPage: FC = () => {
         <Col xs={12} sm={8} md={6} lg={4} className="mx-auto">
           <div className="auth-container p-4 border rounded shadow">
             <h2 className="text-center mb-4">Регистрация</h2>
-            {error && <Alert variant="danger" className="mb-4">{error}</Alert>} {/* Отклик на ошибку */}
+            {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
             <Form>
               <Form.Group controlId="formUsername">
                 <Form.Label>Логин</Form.Label>
@@ -73,7 +73,7 @@ const RegisterPage: FC = () => {
                 />
               </Form.Group>
 
-              <Button variant="primary" onClick={handleRegister} className="w-100 mt-4">
+              <Button variant="danger" onClick={handleRegister} className="w-100 mt-4">
                 Зарегистрироваться
               </Button>
             </Form>

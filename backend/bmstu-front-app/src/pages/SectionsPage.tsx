@@ -113,10 +113,10 @@ const SectionsPage: FC = () => {
             <div className="btncontainer">
                 {applicationSectionsCounter > 0 ? (
                     <Button variant="light" onClick={handleApplicationButtonClick}>
-                        ЗАЯВКА <Badge bg="danger">{applicationSectionsCounter}</Badge>
+                        Заявка <Badge bg="danger">{applicationSectionsCounter}</Badge>
                     </Button>
                 ) : (
-                    <Button variant="secondary">ЗАЯВКА</Button> 
+                    <Button variant="secondary">Заявка</Button> 
                 )}
             </div>
         </div>

@@ -1,14 +1,12 @@
 import "./SectionsTablePage.css";
 import { FC, useEffect, useState } from "react";
 import { Col, Row, Spinner, Container, Button } from "react-bootstrap";
-import { SearchComponent } from "../components/SearchComponent";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { useNavigate } from "react-router-dom";
 import { SECTIONS_MOCK } from "../modules/mocks";
 import { NavigationBar } from "../components/NavBar";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import { logoutUser } from "../redux/authSlice";
 import { useAppDispatch } from '../redux/store';
 import { api } from '../api';
@@ -17,7 +15,6 @@ import { DateDisplay } from '../helpers/DateDisplay';
 
 const SectionsTablePage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-    const searchValue = useSelector((state: RootState) => state.search.searchValue);
     const [loading, setLoading] = useState(false);
     const [sections, setSections] = useState<Section[]>([]);
 
@@ -26,7 +23,7 @@ const SectionsTablePage: FC = () => {
 
     const fetchSections = () => {
         setLoading(true);
-        api.sections.sectionsList({section_title: searchValue})
+        api.sections.sectionsList()
             .then((response) => {
                 const data = response.data;
 
@@ -53,7 +50,7 @@ const SectionsTablePage: FC = () => {
 
     useEffect(() => {
         fetchSections();
-    }, [searchValue])
+    }, [])
 
     const handleCardClick = (id: number | undefined) => {
         if (id) {
@@ -96,19 +93,11 @@ const SectionsTablePage: FC = () => {
                 is_staff={user.is_staff}
                 handleLogout={handleLogout}
             />
-            <div className="cccontainer">
+            <div className="sections-table-page-container">
                 <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.SECTIONS }]} />
             
                 <div className="top-container">
                     <div className="title">На этой неделе</div>
-                </div>
-
-                <div className="horizontal-container">
-                    <SearchComponent/>
-
-                    <div className="btncontainer">
-                        <Button variant="primary" onClick={handleAddButtonClick}>Добавить секцию</Button>
-                    </div>
                 </div>
 
                 {loading && (
@@ -123,6 +112,10 @@ const SectionsTablePage: FC = () => {
                         </div>
                     ) : (
                         <div className="table-container">
+                            <div className="sections-table-page-horizontal-container">
+                                <Button variant="danger" onClick={handleAddButtonClick}>Добавить секцию</Button>
+                            </div>
+
                             <Container fluid>
                                 <Row>
                                     <Col>#</Col>
@@ -134,13 +127,13 @@ const SectionsTablePage: FC = () => {
                                 </Row>
 
                                 {sections.map((item, _) => (
-                                    <Row key={item.pk} className="my-2 custom-row align-items-center">
+                                    <Row key={item.pk} className="my-2 sections-table-page-row align-items-center">
                                         <Col onClick={() => handleCardClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
                                         <Col>{item.title}</Col>
                                         <Col>{item.location || '--'}</Col>
                                         <Col><DateDisplay dateString={item.date || ''}/></Col>
                                         <Col>{item.instructor || '--'}</Col>
-                                        <Col>{item.duration || '--'}</Col>
+                                        <Col>{item.duration || '--'} мин</Col>
                                     </Row>
                                 ))}
                             </Container>

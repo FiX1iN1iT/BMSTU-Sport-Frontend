@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from '../redux/store';
 import { logoutUser } from "../redux/authSlice";
 
-export const HomePage: FC = () => {
+const HomePage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
     const authDispatch = useAppDispatch();
@@ -42,3 +42,5 @@ export const HomePage: FC = () => {
         </div>
     );
 };
+
+export default HomePage;

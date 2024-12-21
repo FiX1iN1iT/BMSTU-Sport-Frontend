@@ -15,7 +15,7 @@ import { useAppDispatch } from '../redux/store';
 import { api } from '../api';
 import { Section } from '../api/Api';
 
-export const AlbumPage: FC = () => {
+const SectionPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
     const [pageData, setPageDdata] = useState<Section>();
@@ -103,3 +103,5 @@ export const AlbumPage: FC = () => {
         </div>
     );
 };
+
+export default SectionPage;

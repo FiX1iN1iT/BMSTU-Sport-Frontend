@@ -1,4 +1,12 @@
-/* top-container */
+.sections-table-page-container {
+    margin: 20px;
+}
+
+.sections-table-page-horizontal-container {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 20px;
+}
 
 .top-container {
     margin-left: 50px;
@@ -13,37 +21,14 @@
     font-weight: bold;
 }
 
-/* top-container */
-
-/* applications-table */
-
 .table-container {
     width: 80%;
     margin: auto;
 }
 
-/* applications-table */
-
-/* filter-container */
-
-.filter-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-}
-
-/* filter-container */
-
-/* custom-row */
-
-.custom-row {
+.sections-table-page-row {
     border-radius: 16px;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     height: 100px;
 }
-
-/* custom-row */

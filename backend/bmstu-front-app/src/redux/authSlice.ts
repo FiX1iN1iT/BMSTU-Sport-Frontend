@@ -22,7 +22,7 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
     'auth/logout',
     async () => {
-        const response = await api.logout.logoutCreate();
+        await api.logout.logoutCreate();
         return {};
     }
 );
