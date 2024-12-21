@@ -92,7 +92,7 @@
 .application-cell .minus {
     position: absolute;
     bottom: 10%;
-    right: 1.3%;
+    right: 1%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }

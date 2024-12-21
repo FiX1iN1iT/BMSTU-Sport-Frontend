@@ -3,6 +3,7 @@ import { Image, Button } from 'react-bootstrap';
 import './ApplicationRow.css';
 import { DateDisplay } from '../helpers/DateDisplay';
 import defaultImage from "../assets/default_image.png";
+import { FaTrash } from 'react-icons/fa';
 
 interface ApplicationRowProps {
     imageUrl: string;
@@ -54,7 +55,7 @@ export const ApplicationRow: FC<ApplicationRowProps> = ({
 
                 <div className="minus">
                     <Button variant="outline-danger" onClick={handleMinusClick} size="sm">
-                        –
+                        <FaTrash/>
                     </Button>
                 </div>
             </div>

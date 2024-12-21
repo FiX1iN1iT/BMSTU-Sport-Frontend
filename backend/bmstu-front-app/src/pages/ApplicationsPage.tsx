@@ -49,7 +49,7 @@ const ApplicationsPage: FC = () => {
                 setApplications([]);
                 setLoading(false);
             })
-    }, [startDate, endDate, status])
+    }, [startDate, endDate, status]);
 
     const handleRowClick = (id: number | undefined) => {
         if (id) {
@@ -57,7 +57,7 @@ const ApplicationsPage: FC = () => {
         } else {
             console.log("Ошибка перехода на страницу заявки по id")
         }
-    }
+    };
 
     const handleLogout = async () => {
         try {
@@ -72,11 +72,17 @@ const ApplicationsPage: FC = () => {
     const handleFilterChange = () => {
         setStartDate((document.getElementById('start-date') as HTMLInputElement).value);
         setEndDate((document.getElementById('end-date') as HTMLInputElement).value);
-    }
+    };
 
     const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setStatus(event.target.value);
-    }
+    };
+
+    const statusDictionary: Record<string, string> = {
+        created: 'Сформирована',
+        completed: 'Завершена',
+        rejected: 'Отклонена'
+    };
 
     return(
         <div>
@@ -144,13 +150,13 @@ const ApplicationsPage: FC = () => {
                                 <Col>Дата формирования</Col>
                                 <Col>Дата завершения</Col>
                                 <Col>ФИО</Col>
-                                <Col>Кол-во секций</Col>
+                                <Col>Кол-во ауд.</Col>
                             </Row>
 
                             {applications.map((item, _) => (
                                 <Row key={item.pk} onClick={() => handleRowClick(item.pk)} className="my-2 custom-row align-items-center">
                                     <Col>{item.pk}</Col>
-                                    <Col>{item.status}</Col>
+                                    <Col>{statusDictionary[item.status || 'created']}</Col>
                                     <Col><DateDisplay dateString={item.creation_date || ''}/></Col>
                                     <Col><DateDisplay dateString={item.apply_date || ''}/></Col>
                                     <Col><DateDisplay dateString={item.end_date || ''}/></Col>
