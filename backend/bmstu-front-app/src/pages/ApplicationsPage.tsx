@@ -246,7 +246,6 @@ const ApplicationsPage: FC = () => {
                                     <Col><DateDisplay dateString={item.end_date || ''}/></Col>
                                     <Col>{item.creator}</Col>
                                     <Col>{item.full_name || '--'}</Col>
-                                    <Col>{item.number_of_sections || '--'}</Col>
                                 </Row>
                             ))}
                         </Container>
