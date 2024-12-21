@@ -5,161 +5,125 @@ import { ROUTES, ROUTE_LABELS } from '../Routes';
 import { api } from '../api';
 import { User } from '../api/Api';
 import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store'; // Путь к файлу, где находится ваш store
+import { RootState } from '../redux/store';
 
 const ProfilePage: FC = () => {
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [password, setPassword] = useState('');
 
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Получаем userId из Redux
-  const { user } = useSelector((state: RootState) => state.auth);
-  const userId = user?.id; // Получаем ID пользователя из стора, предполагая, что оно хранится там
+    const { user } = useSelector((state: RootState) => state.auth);
+    const userId = user?.id;
 
-  // Загрузка данных профиля при монтировании компонента
-  useEffect(() => {
-    if (!userId) {
-      setError('Не удалось получить ID пользователя');
-      return;
-    }
+    useEffect(() => {
+        if (!userId) {
+            setError('Не удалось получить ID пользователя');
+            return;
+        }
 
-    const fetchProfileData = async () => {
-      try {
-        const profileData = (await api.api.apiUserRead(userId)).data; // Используем метод userRead для получения данных пользователя
+        setEmail(user.username || '');
+    }, [userId]);
 
-        // setUsername(profileData.username || ''); // Если значение username не задано, используем пустую строку
-        setFirstName(profileData.first_name || '');
-        setLastName(profileData.last_name || '');
-        setEmail(profileData.email || '');
-      } catch (err) {
-        setError('Ошибка при загрузке данных');
-      }
+    const handleProfileUpdate = async () => {
+        if (!user || !userId) {
+            alert('Пользователь не авторизован');
+            return;
+        }
+
+        if (email == '' || password == '') {
+            setSuccessMessage(null);
+            setError('Введите email и пароль для обновления данных');
+            return;
+        }
+
+        const updatedData: User = {email: email, password: password};
+
+        if (firstName?.trim()) updatedData.first_name = firstName.trim();
+        if (lastName?.trim()) updatedData.last_name = lastName.trim();
+
+        api.api.apiUserUpdate(userId, updatedData)
+            .then(() => {
+                setError(null);
+                setSuccessMessage('Данные успешно обновлены');
+            })
+            .catch(() => {
+                setSuccessMessage(null);
+                setError('Ошибка при обновлении данных');
+            });
     };
 
-    fetchProfileData();
-  }, [userId]);
+    return (
+        <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
+        <Row className="w-100">
+            <BreadCrumbs
+            crumbs={[
+                { label: ROUTE_LABELS.USER_DASHBOARD, path: ROUTES.USER_DASHBOARD }
+            ]}
+            />
+            <Col xs={12} sm={8} md={6} lg={4} className="mx-auto">
+            <div className="auth-container p-4 border rounded shadow">
+                <h2 className="text-center mb-4">Личный кабинет</h2>
 
-  const handleProfileUpdate = async () => {
-    if (!user) {
-      alert('Пользователь не авторизован');
-      return;
-    }
+                {/* Сообщение об успехе */}
+                {successMessage && <Alert variant="success" className="mb-4">{successMessage}</Alert>}
 
-    const updatedData: User = {email: email, password: password};
+                {/* Сообщение об ошибке */}
+                {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
 
-    // Добавляем только изменённые поля
-    // if (username?.trim()) updatedData.username = username.trim();
-    if (firstName?.trim()) updatedData.first_name = firstName.trim();
-    if (lastName?.trim()) updatedData.last_name = lastName.trim();
-    if (email?.trim()) updatedData.email = email.trim() || '';
+                <Form>
+                <Form.Group controlId="formEmail" className="mt-3">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control 
+                    type="email" 
+                    placeholder="Введите email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    />
+                </Form.Group>
 
-    if (password && password.trim() !== '') {
-      updatedData.password = password.trim();
-    }
+                <Form.Group controlId="formFirstName" className="mt-3">
+                    <Form.Label>Имя</Form.Label>
+                    <Form.Control 
+                    type="text" 
+                    placeholder="Введите имя" 
+                    value={firstName} 
+                    onChange={(e) => setFirstName(e.target.value)} 
+                    />
+                </Form.Group>
 
-    // Если нет обновлённого пароля, не передаем его
-    // if (!updatedData.password) {
-    //   delete updatedData.password;
-    // }
+                <Form.Group controlId="formLastName" className="mt-3">
+                    <Form.Label>Фамилия</Form.Label>
+                    <Form.Control 
+                    type="text" 
+                    placeholder="Введите фамилию" 
+                    value={lastName} 
+                    onChange={(e) => setLastName(e.target.value)} 
+                    />
+                </Form.Group>
 
-    if (!userId) {
-      alert('Не указан ID пользователя');
-      return;
-    }
+                <Form.Group controlId="formPassword" className="mt-3">
+                    <Form.Label>Пароль</Form.Label>
+                    <Form.Control 
+                    type="password" 
+                    placeholder="Введите пароль" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    />
+                </Form.Group>
 
-    try {
-      const response = await api.api.apiUserUpdate(userId, updatedData);
-
-      setSuccessMessage('Данные успешно обновлены');
-    } catch (err) {
-      console.error('Ошибка при обновлении данных', err);
-      setError('Ошибка при обновлении данных');
-    }
-  };
-
-  return (
-    <Container fluid className="d-flex justify-content-center align-items-center min-vh-100">
-      <Row className="w-100">
-        <BreadCrumbs
-          crumbs={[
-            { label: ROUTE_LABELS.USER_DASHBOARD, path: ROUTES.USER_DASHBOARD }
-          ]}
-        />
-        <Col xs={12} sm={8} md={6} lg={4} className="mx-auto">
-          <div className="auth-container p-4 border rounded shadow">
-            <h2 className="text-center mb-4">Личный кабинет</h2>
-
-            {/* Сообщение об успехе */}
-            {successMessage && <Alert variant="success" className="mb-4">{successMessage}</Alert>}
-
-            {/* Сообщение об ошибке */}
-            {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
-
-            <Form>
-              <Form.Group controlId="formEmail" className="mt-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control 
-                  type="email" 
-                  placeholder="Введите email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formFirstName" className="mt-3">
-                <Form.Label>Имя</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  placeholder="Введите имя" 
-                  value={firstName} 
-                  onChange={(e) => setFirstName(e.target.value)} 
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formLastName" className="mt-3">
-                <Form.Label>Фамилия</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  placeholder="Введите фамилию" 
-                  value={lastName} 
-                  onChange={(e) => setLastName(e.target.value)} 
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formPassword" className="mt-3">
-                <Form.Label>Старый пароль</Form.Label>
-                <Form.Control 
-                  type="password" 
-                  placeholder="Введите старый пароль" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formNewPassword" className="mt-3">
-                <Form.Label>Новый пароль</Form.Label>
-                <Form.Control 
-                  type="password"
-                  placeholder="Введите новый пароль"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </Form.Group>
-
-              <Button variant="primary" onClick={handleProfileUpdate} className="w-100 mt-4">
-                Обновить данные
-              </Button>
-            </Form>
-          </div>
-        </Col>
-      </Row>
-    </Container>
-  );
+                <Button variant="primary" onClick={handleProfileUpdate} className="w-100 mt-4">
+                    Обновить данные
+                </Button>
+                </Form>
+            </div>
+            </Col>
+        </Row>
+        </Container>
+    );
 };
 
 export default ProfilePage;
