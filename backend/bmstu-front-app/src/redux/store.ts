@@ -3,12 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import searchReducer from './searchSlice.ts';
 import authReducer from './authSlice';
 import sectionsReducer from './sectionsSlice.ts'
+import sectionReducer from './sectionSlice.ts'
 
 export const store = configureStore({
     reducer: {
         search: searchReducer,
         auth: authReducer,
-        sections: sectionsReducer
+        sections: sectionsReducer,
+        section: sectionReducer,
     },
 });
 

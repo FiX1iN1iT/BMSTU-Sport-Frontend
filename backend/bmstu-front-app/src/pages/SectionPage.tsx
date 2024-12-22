@@ -1,47 +1,34 @@
 import "./SectionPage.css";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { useParams } from "react-router-dom";
 import { Spinner, Image } from "react-bootstrap";
 import defaultImage from "../assets/default_image.png";
-import { SECTION_MOCK } from "../modules/mocks";
 import { DateDisplay } from '../helpers/DateDisplay';
 import { NavigationBar } from "../components/NavBar";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../redux/authSlice";
-import { useAppDispatch } from '../redux/store';
-import { api } from '../api';
-import { Section } from '../api/Api';
+import { useAppDispatch, RootState } from '../redux/store';
+import { fetchSection } from "../redux/sectionSlice";
 
 const SectionPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+    const { data } = useSelector((state: RootState) => state.section);  
 
-    const [pageData, setPageDdata] = useState<Section>();
-
-    const authDispatch = useAppDispatch();
+    const appDispatch = useAppDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
 
     useEffect(() => {
         if (!id) return;
-
-        api.sections.sectionsRead(id)
-            .then((response) => {
-                const data = response.data;
-
-                setPageDdata(data)
-            })
-            .catch(() => {
-                setPageDdata(SECTION_MOCK);
-            });
-    }, [id]);
+        appDispatch(fetchSection(id));
+    }, [appDispatch, id]);
 
     const handleLogout = async () => {
         try {
-            await authDispatch(logoutUser()).unwrap();
-
+            await appDispatch(logoutUser()).unwrap();
             navigate(ROUTES.HOME);
         } catch (error) {
             console.error('Ошибка деавторизации:', error);
@@ -57,42 +44,42 @@ const SectionPage: FC = () => {
                 handleLogout={handleLogout}
             />
 
-            {pageData ? (
+            {data ? (
                 <div className="section">
                     <BreadCrumbs
                         crumbs={[
                         { label: ROUTE_LABELS.SECTIONS, path: ROUTES.SECTIONS },
-                        { label: pageData?.title || "Секция" },
+                        { label: data.title || "Секция" },
                         ]}
                     />
 
                     <Image
                         className="image"
-                        src={pageData.imageUrl || defaultImage}
+                        src={data.imageUrl || defaultImage}
                         alt="Image"
                     />
 
-                    <div className="title">{pageData.title}</div>
+                    <div className="title">{data.title}</div>
                     <div className="content-header">О курсе</div>
                     <div className="content">
                         <div className="content-name">Место:&nbsp;</div>
-                        <div className="content-value">{pageData.location}</div>
+                        <div className="content-value">{data.location}</div>
                     </div>
                     <div className="content">
                         <div className="content-name">Дата и время:&nbsp;</div>
-                        <div className="content-value"><DateDisplay dateString={pageData.date || ''}/></div>
+                        <div className="content-value"><DateDisplay dateString={data.date}/></div>
                     </div>
                     <div className="content">
                         <div className="content-name">Преподаватель:&nbsp;</div>
-                        <div className="content-value">{pageData.instructor}</div>
+                        <div className="content-value">{data.instructor}</div>
                     </div>
                     <div className="content">
                         <div className="content-name">Длительность занятия:&nbsp;</div>
-                        <div className="content-value">{pageData.duration}&nbsp;минут</div>
+                        <div className="content-value">{data.duration}&nbsp;минут</div>
                     </div>
                     <div className="content">
                         <div className="content-name">Описание:&nbsp;</div>
-                        <div className="content-value">{pageData.description}</div>
+                        <div className="content-value">{data.description}</div>
                     </div>
                 </div>
             ) : (
