@@ -9,9 +9,9 @@ export const SearchComponent = () => {
 
     return (
         <SearchField
-        value={searchValue}
-        setValue={(value) => dispatch(setSearchValue(value))}
-        placeholder="Поиск по названию"
+            value={searchValue}
+            setValue={(value) => dispatch(setSearchValue(value))}
+            placeholder="Поиск по названию"
         />
     );
 };
