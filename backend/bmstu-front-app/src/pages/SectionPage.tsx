@@ -15,7 +15,7 @@ import { fetchSection } from "../redux/sectionSlice";
 
 const SectionPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-    const { data } = useSelector((state: RootState) => state.section);  
+    const { data } = useSelector((state: RootState) => state.section);
 
     const appDispatch = useAppDispatch();
     const navigate = useNavigate();
