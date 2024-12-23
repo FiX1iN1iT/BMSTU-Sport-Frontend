@@ -1,6 +1,6 @@
+import './SectionCard.css';
 import React, { FC } from 'react';
 import { Button, Card } from 'react-bootstrap';
-import './SectionCard.css';
 import { DateDisplay } from '../helpers/DateDisplay';
 import defaultImage from "../assets/default_image.png";
 

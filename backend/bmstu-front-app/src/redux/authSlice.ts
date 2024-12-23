@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../api';
+import { User } from '../api/Api'
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -27,6 +28,22 @@ export const logoutUser = createAsyncThunk(
     }
 );
 
+export const registerUser = createAsyncThunk(
+    'auth/registerUser',
+    async ({ email, password }: { email: string; password: string }) => {
+        await api.api.apiUserCreate({ email, password });
+        return {};
+    }
+);
+
+export const updateUser = createAsyncThunk(
+    'auth/updateUser',
+    async ({ userId, updatedUser }: { userId: number; updatedUser: User }) => {
+        await api.api.apiUserUpdate(userId, updatedUser);
+        return {};
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -37,6 +54,7 @@ const authSlice = createSlice({
                 state.isAuthenticated = true;
                 state.user = action.payload;
             })
+
             .addCase(logoutUser.fulfilled, (state) => {
                 state.isAuthenticated = false;
                 state.user = { username: null, id: null, is_staff: false };

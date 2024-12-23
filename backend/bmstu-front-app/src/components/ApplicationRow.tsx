@@ -1,6 +1,6 @@
+import './ApplicationRow.css';
 import { FC } from 'react';
 import { Image, Button } from 'react-bootstrap';
-import './ApplicationRow.css';
 import { DateDisplay } from '../helpers/DateDisplay';
 import defaultImage from "../assets/default_image.png";
 import { FaTrash } from 'react-icons/fa';

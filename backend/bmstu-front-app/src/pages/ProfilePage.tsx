@@ -2,12 +2,15 @@ import { FC, useState, useEffect } from 'react';
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { BreadCrumbs } from '../components/BreadCrumbs';
 import { ROUTES, ROUTE_LABELS } from '../Routes';
-import { api } from '../api';
 import { User } from '../api/Api';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import { useAppDispatch } from '../redux/store';
+import { updateUser } from '../redux/authSlice';
 
 const ProfilePage: FC = () => {
+    const { user } = useSelector((state: RootState) => state.auth);
+
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -16,20 +19,19 @@ const ProfilePage: FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const { user } = useSelector((state: RootState) => state.auth);
-    const userId = user?.id;
+    const appDispatch = useAppDispatch();
 
     useEffect(() => {
-        if (!userId) {
+        if (!user || !user.id) {
             setError('Не удалось получить ID пользователя');
             return;
         }
 
         setEmail(user.username || '');
-    }, [userId]);
+    }, [user]);
 
     const handleProfileUpdate = async () => {
-        if (!user || !userId) {
+        if (!user || !user.id) {
             alert('Пользователь не авторизован');
             return;
         }
@@ -40,20 +42,19 @@ const ProfilePage: FC = () => {
             return;
         }
 
-        const updatedData: User = {email: email, password: password};
+        const updatedUser: User = {email: email, password: password};
 
-        if (firstName?.trim()) updatedData.first_name = firstName.trim();
-        if (lastName?.trim()) updatedData.last_name = lastName.trim();
+        if (firstName?.trim()) updatedUser.first_name = firstName.trim();
+        if (lastName?.trim()) updatedUser.last_name = lastName.trim();
 
-        api.api.apiUserUpdate(userId, updatedData)
-            .then(() => {
-                setError(null);
-                setSuccessMessage('Данные успешно обновлены');
-            })
-            .catch(() => {
-                setSuccessMessage(null);
-                setError('Ошибка при обновлении данных');
-            });
+        try {
+            await appDispatch(updateUser({ userId: user.id, updatedUser })).unwrap();
+            setError(null);
+            setSuccessMessage('Данные успешно обновлены');
+        } catch (error) {
+            setSuccessMessage(null);
+            setError('Ошибка при обновлении данных');
+        }
     };
 
     return (

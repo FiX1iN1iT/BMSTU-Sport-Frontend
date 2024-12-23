@@ -1,6 +1,6 @@
+import './InputField.css'
 import { FC } from 'react'
 import { Button } from 'react-bootstrap'
-import './InputField.css'
 
 interface Props {
     value: string
