@@ -4,19 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { logoutUser } from "../redux/authSlice";
-import { useAppDispatch } from '../redux/store';
 import { NavigationBar } from "../components/NavBar";
 import { BreadCrumbs } from "../components/BreadCrumbs";
-import { api } from '../api';
 import { SportApplication } from '../api/Api';
 import { DateDisplay } from '../helpers/DateDisplay';
 import { Container, Row, Spinner, Col } from "react-bootstrap";
+import { useAppDispatch, RootState } from '../redux/store';
+import { fetchApplications, changeStatus } from "../redux/applicationsSlice";
 
 const ApplicationsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-
-    const [applications, setApplications] = useState<SportApplication[]>([]);
-    const [loading, setLoading] = useState(false);
+    const { data, loading } = useSelector((state: RootState) => state.applications);
 
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
@@ -24,66 +22,36 @@ const ApplicationsPage: FC = () => {
 
     const [filteredApplications, setFilteredApplications] = useState<SportApplication[]>([]);
     const [creator, setCreator] = useState<string>('');
-    const [creatorList, setCreatorList] = useState<string[]>([]);
 
-    const authDispatch = useAppDispatch();
+    const appDispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const fetchApplications = () => {
-        api.applications.applicationsList({ start_apply_date: startDate, end_apply_date: endDate, status: status })
-            .then((response) => {
-                const data = response.data;
-
-                if (data && Array.isArray(data)) {
-                    const applicationsData = data as SportApplication[];
-
-                    const creators = applicationsData.map(app => app.creator);
-                    const uniqueCreators = new Set(creators);
-                    setCreatorList(Array.from(uniqueCreators));
-
-                    setApplications(applicationsData);
-                    setFilteredApplications(applicationsData);
-                } else {
-                    setCreatorList([]);
-                    setApplications([]);
-                    setFilteredApplications([]);
-                }
-            })
-            .catch((error) => {
-                console.error('Ошибка при загрузке данных:', error);
-                setCreatorList([]);
-                setApplications([]);
-                setFilteredApplications([]);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+    const fetchData = () => {
+        appDispatch(fetchApplications({ startDate: startDate, endDate: endDate, status: status }));
     };
 
     useEffect(() => {
         if (!isAuthenticated) navigate(ROUTES.FORBIDDEN);
-
-        setLoading(true);
-        fetchApplications();
+        fetchData();
     }, [])
 
     useEffect(() => {
         if (!isAuthenticated) navigate(ROUTES.FORBIDDEN);
 
-        fetchApplications();
+        fetchData();
 
         const interval = setInterval(() => {
-            fetchApplications();
+            fetchData();
         }, 2000);
     
         return () => clearInterval(interval);
     }, [startDate, endDate, status])
 
     useEffect(() => {
-        if (creator == "") {
-            setFilteredApplications(applications);
+        if (creator == '') {
+            setFilteredApplications(data.applications);
         } else {
-            const filtered = applications.filter((applications) => {
+            const filtered = data.applications.filter((applications) => {
                 if (applications.creator) {
                     return applications.creator == creator
                 } else {
@@ -93,19 +61,15 @@ const ApplicationsPage: FC = () => {
 
             setFilteredApplications(filtered)
         }
-    }, [creator])
+    }, [data, creator])
 
     const handleRowClick = (id: number | undefined) => {
-        if (id) {
-            navigate(`${ROUTES.APPLICATIONS}/${id}`);
-        } else {
-            console.log("Ошибка перехода на страницу заявки по id")
-        }
+        if (id) navigate(`${ROUTES.APPLICATIONS}/${id}`);
     };
 
     const handleLogout = async () => {
         try {
-            await authDispatch(logoutUser()).unwrap();
+            await appDispatch(logoutUser()).unwrap();
         
             navigate(ROUTES.HOME);
         } catch (error) {
@@ -113,13 +77,8 @@ const ApplicationsPage: FC = () => {
         }
     };
 
-    const handleApplicationStatusChange = (chosenStatus: string, applicationId: number) => {
-        const applicationIdString = String(applicationId);
-
-        api.applications.applicationsApproveRejectUpdate(applicationIdString, { status: chosenStatus })
-            .catch(() => {
-                alert('Заявка может быть завершена или отклонена только из статуса "Сформирована"');
-            })
+    const handleApplicationStatusChange = (applicationId: number, status: string) => {
+        appDispatch(changeStatus({ applicationId: String(applicationId), status: status }));
     }
 
     const handleFilterChange = () => {
@@ -189,9 +148,9 @@ const ApplicationsPage: FC = () => {
                     </label>
                     <label>
                         Создатель:
-                        <select value={status} onChange={handleCreatorChange}>
+                        <select value={creator} onChange={handleCreatorChange}>
                             <option value="">Все</option>
-                            {creatorList.map((item, _) => (
+                            {data.creators.map((item, _) => (
                                 <option key={item} value={item}>{item}</option>
                             ))}
                         </select>
@@ -207,7 +166,7 @@ const ApplicationsPage: FC = () => {
                 </div>
             )}
             {!loading && 
-                (!applications.length ? (
+                (!data.applications.length ? (
                     <div>
                         <h1>Заявок нет</h1>
                     </div>
@@ -230,7 +189,7 @@ const ApplicationsPage: FC = () => {
 
                                     {user.is_staff ? (
                                         <Col>
-                                            <select value={item.status} onChange={(e) => handleApplicationStatusChange(e.target.value, item.pk)}>
+                                            <select value={item.status} onChange={(e) => handleApplicationStatusChange(item.pk, e.target.value)}>
                                                 <option value="created">Сформирована</option>
                                                 <option value="completed">Завершена</option>
                                                 <option value="rejected">Отклонена</option>

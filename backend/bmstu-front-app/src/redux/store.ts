@@ -5,6 +5,7 @@ import authReducer from './authSlice';
 import sectionsReducer from './sectionsSlice.ts'
 import sectionReducer from './sectionSlice.ts'
 import applicationReducer from './applicationSlice.ts'
+import applicationsReducer from './applicationsSlice.ts'
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         sections: sectionsReducer,
         section: sectionReducer,
         application: applicationReducer,
+        applications: applicationsReducer,
     },
 });
 

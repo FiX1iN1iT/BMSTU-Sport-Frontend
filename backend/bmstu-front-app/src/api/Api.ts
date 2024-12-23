@@ -408,17 +408,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     ) =>
       this.request<
         {
-          applications?: {
-            pk?: number;
-            status?: string;
-            creation_date?: string;
-            apply_date?: string;
-            end_date?: string;
-            creator?: string;
-            moderator?: number;
-            full_name?: string;
-            number_of_sections?: string;
-          }[];
+          applications: SportApplication[];
         },
         any
       >({
