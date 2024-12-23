@@ -4,6 +4,7 @@ import searchReducer from './searchSlice.ts';
 import authReducer from './authSlice';
 import sectionsReducer from './sectionsSlice.ts'
 import sectionReducer from './sectionSlice.ts'
+import applicationReducer from './applicationSlice.ts'
 
 export const store = configureStore({
     reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
         auth: authReducer,
         sections: sectionsReducer,
         section: sectionReducer,
+        application: applicationReducer,
     },
 });
 

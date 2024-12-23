@@ -41,22 +41,22 @@ export interface SportApplication {
   /** ID */
   pk: number;
   /** Status */
-  status?: "draft" | "deleted" | "created" | "completed" | "rejected";
+  status: "draft" | "deleted" | "created" | "completed" | "rejected";
   /**
    * Creation date
    * @format date-time
    */
-  creation_date?: string;
+  creation_date: string;
   /**
    * Apply date
    * @format date-time
    */
-  apply_date?: string | null;
+  apply_date: string | null;
   /**
    * End date
    * @format date-time
    */
-  end_date?: string | null;
+  end_date: string | null;
   /**
    * Creator
    * @format email
@@ -64,18 +64,18 @@ export interface SportApplication {
    */
   creator: string;
   /** Moderator */
-  moderator?: string;
+  moderator: string | null;
   /**
    * Full name
    * @maxLength 100
    */
-  full_name?: string | null;
+  full_name: string | null;
   /**
    * Number of sections
    * @min -2147483648
    * @max 2147483647
    */
-  number_of_sections?: number | null;
+  number_of_sections: number | null;
 }
 
 export interface Section {
@@ -469,27 +469,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     applicationsRead: (applicationId: string, params: RequestParams = {}) =>
       this.request<
         {
-          application?: {
-            pk?: number;
-            status?: string;
-            creation_date?: string;
-            apply_date?: string;
-            end_date?: string;
-            creator?: string;
-            moderator?: number;
-            full_name?: string;
-            number_of_sections?: string;
-          };
-          sections?: {
-            pk?: number;
-            title?: string;
-            description?: string;
-            location?: string;
-            date?: string;
-            instructor?: string;
-            duration?: number;
-            imageUrl?: string;
-          }[];
+          application: SportApplication;
+          sections: Section[];
         },
         any
       >({
@@ -576,27 +557,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     applicationsPriorityUpdate: (applicationId: string, sectionId: string, params: RequestParams = {}) =>
         this.request<
     {
-      application?: {
-        pk?: number;
-        status?: string;
-        creation_date?: string;
-        apply_date?: string;
-        end_date?: string;
-        creator?: string;
-        moderator?: number;
-        full_name?: string;
-        number_of_sections?: string;
-      };
-      sections?: {
-        pk?: number;
-        title?: string;
-        description?: string;
-        location?: string;
-        date?: string;
-        instructor?: string;
-        duration?: number;
-        imageUrl?: string;
-      }[];
+      application: SportApplication;
+      sections: Section[];
     },
     any
   >({
@@ -618,27 +580,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     applicationsPriorityDelete: (applicationId: string, sectionId: string, params: RequestParams = {}) =>
         this.request<
     {
-      application?: {
-        pk?: number;
-        status?: string;
-        creation_date?: string;
-        apply_date?: string;
-        end_date?: string;
-        creator?: string;
-        moderator?: number;
-        full_name?: string;
-        number_of_sections?: string;
-      };
-      sections?: {
-        pk?: number;
-        title?: string;
-        description?: string;
-        location?: string;
-        date?: string;
-        instructor?: string;
-        duration?: number;
-        imageUrl?: string;
-      }[];
+      application: SportApplication;
+      sections: Section[];
     },
     any
   >({

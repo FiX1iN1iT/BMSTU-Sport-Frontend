@@ -15,7 +15,7 @@ import { fetchSections, addSectionToDraft } from "../redux/sectionsSlice";
 const SectionsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
     const searchValue = useSelector((state: RootState) => state.search.searchValue);
-    const { data, loading } = useSelector((state: RootState) => state.sections);  
+    const { data, loading } = useSelector((state: RootState) => state.sections);
 
     const appDispatch = useAppDispatch();
     const navigate = useNavigate();
