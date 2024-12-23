@@ -80,7 +80,7 @@ export interface SportApplication {
 
 export interface Section {
   /** ID */
-  pk: number;
+  pk?: number;
   /**
    * Title
    * @minLength 1
@@ -92,36 +92,36 @@ export interface Section {
    * @minLength 1
    * @maxLength 500
    */
-  description: string;
+  description?: string;
   /**
    * Location
    * @minLength 1
    * @maxLength 200
    */
-  location: string;
+  location?: string;
   /**
    * Date
    * @format date-time
    */
-  date: string;
+  date?: string;
   /**
    * Instructor
    * @minLength 1
    * @maxLength 100
    */
-  instructor: string;
+  instructor?: string;
   /**
    * Duration
    * @min -2147483648
    * @max 2147483647
    */
-  duration: number;
+  duration?: number;
   /**
    * ImageUrl
    * @format uri
    * @maxLength 200
    */
-  imageUrl: string | null;
+  imageUrl?: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";

@@ -1,61 +1,39 @@
 import "./SectionsTablePage.css";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { Col, Row, Spinner, Container, Button } from "react-bootstrap";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { useNavigate } from "react-router-dom";
-import { SECTIONS_MOCK } from "../modules/mocks";
 import { NavigationBar } from "../components/NavBar";
 import { useSelector } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
-import { useAppDispatch } from '../redux/store';
-import { api } from '../api';
+import { useAppDispatch, RootState } from '../redux/store';
 import { Section } from '../api/Api';
 import { DateDisplay } from '../helpers/DateDisplay';
+import { fetchSections, createSection } from "../redux/sectionsSlice";
 
 const SectionsTablePage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-    const [loading, setLoading] = useState(false);
-    const [sections, setSections] = useState<Section[]>([]);
+    const { data, loading } = useSelector((state: RootState) => state.sections);
 
-    const authDispatch = useAppDispatch();
+    const appDispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const fetchSections = () => {
-        setLoading(true);
-        api.sections.sectionsList()
-            .then((response) => {
-                const data = response.data;
-
-                if (data && data.sections) {
-                    const sectionsData = data.sections as Section[];
-                    setSections(sectionsData);
-                }
-
-                setLoading(false);
-            })
-            .catch(() => {
-                setSections(SECTIONS_MOCK.sections);
-                setLoading(false);
-            });
-    };
+    useEffect(() => {
+        appDispatch(fetchSections());
+    }, [appDispatch])
 
     useEffect(() => {
-        if (user.is_staff) {
-            fetchSections();
-        } else {
+        if (!user.is_staff) {
             navigate(ROUTES.FORBIDDEN);
+            return;
         }
+
+        appDispatch(fetchSections());
     }, [user]);
 
-    useEffect(() => {
-        fetchSections();
-    }, [])
-
     const handleCardClick = (id: number | undefined) => {
-        if (id) {
-            navigate(`${ROUTES.SECTIONSTABLE}/${id}`);
-        }
+        if (id) navigate(`${ROUTES.SECTIONSTABLE}/${id}`);
     };
 
     const handleAddButtonClick = () => {
@@ -63,24 +41,14 @@ const SectionsTablePage: FC = () => {
             title: "Добавленная секция"
         };
         
-        api.sections.sectionsCreate(newSection)
-            .then((response) => {
-                console.log("Секция успешно создана:", response);
-
-                const updatedSections = [...sections, response.data];
-                setSections(updatedSections);
-            })
-            .catch(error => {
-                console.log("Ошибка создания секции:", error);
-            });
+        appDispatch(createSection(newSection));
     };
 
     const handleLogout = async () => {
         try {
-            await authDispatch(logoutUser()).unwrap();
-
+            await appDispatch(logoutUser()).unwrap();
             navigate(ROUTES.HOME);
-            } catch (error) {
+        } catch (error) {
             console.error('Ошибка деавторизации:', error);
         }
     };
@@ -106,7 +74,7 @@ const SectionsTablePage: FC = () => {
                     </div>
                 )}
                 {!loading &&
-                    (!sections.length ? (
+                    (!data.sections.length ? (
                         <div>
                             <h1>Такого курса на этой неделе не будет</h1>
                         </div>
@@ -126,7 +94,7 @@ const SectionsTablePage: FC = () => {
                                     <Col>Продолжительность</Col>
                                 </Row>
 
-                                {sections.map((item, _) => (
+                                {data.sections.map((item, _) => (
                                     <Row key={item.pk} className="my-2 sections-table-page-row align-items-center">
                                         <Col onClick={() => handleCardClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
                                         <Col>{item.title}</Col>

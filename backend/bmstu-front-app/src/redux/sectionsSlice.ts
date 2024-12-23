@@ -22,7 +22,7 @@ const initialState: SectionsState = {
 
 export const fetchSections = createAsyncThunk(
     'sections/fetchSections',
-    async (searchValue: string, { rejectWithValue }) => {
+    async (searchValue: string | undefined, { rejectWithValue }) => {
         try {
             const response = await api.sections.sectionsList({ section_title: searchValue });
             return response.data
@@ -40,6 +40,18 @@ export const addSectionToDraft = createAsyncThunk(
             return response.data
         } catch {
             return rejectWithValue('Не удалось добавить секцию к заявке-черновику')
+        }
+    }
+);
+
+export const createSection = createAsyncThunk(
+    'sections/createSection',
+    async (newSection: Section, { rejectWithValue }) => {
+        try {
+            const response = await api.sections.sectionsCreate(newSection);
+            return response.data
+        } catch {
+            return rejectWithValue('Не удалось создать секцию')
         }
     }
 );
@@ -74,6 +86,14 @@ const sectionsSlice = createSlice({
                 state.data.draftApplicationID = data.draft_application_id;
             })
             .addCase(addSectionToDraft.rejected, (state) => {
+                state.error = true
+            })
+
+            .addCase(createSection.fulfilled, (state, action) => {
+                const data = action.payload;
+                state.data.sections = [...state.data.sections, data];
+            })
+            .addCase(createSection.rejected, (state) => {
                 state.error = true
             })
     }

@@ -29,17 +29,18 @@ const ApplicationPage: FC = () => {
         setFullName(data.applicaiton?.full_name || '');
     }, [appDispatch, id]);
   
-    const handleCardClick = (sectionId: number) => {
+    const handleCardClick = (sectionId: number | undefined) => {
+        if (!sectionId) return;
         navigate(`${ROUTES.SECTIONS}/${sectionId}`);
     };
 
-    const handleArrowClick = (sectionId: number) => {
-        if (!id) return;
+    const handleArrowClick = (sectionId: number | undefined) => {
+        if (!id || !sectionId) return;
         appDispatch(increasePriority({ applicationId: id, sectionId: String(sectionId) }));
     };
 
-    const handleMinusClick = (sectionId: number) => {
-        if (!id) return;
+    const handleMinusClick = (sectionId: number | undefined) => {
+        if (!id || !sectionId) return;
         appDispatch(removeSection({ applicationId: id, sectionId: String(sectionId) }));
     };
 

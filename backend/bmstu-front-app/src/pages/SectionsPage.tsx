@@ -34,7 +34,8 @@ const SectionsPage: FC = () => {
         navigate(`${ROUTES.APPLICATIONS}/${data.draftApplicationID}`);
     };
 
-    const handleAddSection = (sectionId: number) => {
+    const handleAddSection = (sectionId: number | undefined) => {
+        if (!sectionId) return;
         appDispatch(addSectionToDraft(sectionId));
     }
 
@@ -92,11 +93,11 @@ const SectionsPage: FC = () => {
                             <Col xs={12} sm={6} md={4} lg={3} xl={3} key={index}>
                                 <SectionCard
                                     key={item.pk}
-                                    sectionId={item.pk}
+                                    sectionId={item.pk || 0}
                                     imageUrl={item.imageUrl || ''}
                                     title={item.title}
-                                    location={item.location}
-                                    date={item.date}
+                                    location={item.location || ''}
+                                    date={item.date || ''}
                                     plusButtonClickHandler={() => handleAddSection(item.pk)}
                                     imageClickHandler={() => handleCardClick(item.pk)}
                                 />

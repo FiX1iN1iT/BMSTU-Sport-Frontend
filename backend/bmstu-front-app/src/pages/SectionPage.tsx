@@ -67,7 +67,7 @@ const SectionPage: FC = () => {
                     </div>
                     <div className="content">
                         <div className="content-name">Дата и время:&nbsp;</div>
-                        <div className="content-value"><DateDisplay dateString={data.date}/></div>
+                        <div className="content-value"><DateDisplay dateString={data.date || ''}/></div>
                     </div>
                     <div className="content">
                         <div className="content-name">Преподаватель:&nbsp;</div>
