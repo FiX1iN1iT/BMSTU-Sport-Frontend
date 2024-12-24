@@ -92,14 +92,14 @@ const SectionsPage: FC = () => {
                         {data.sections.map((item, index) => (
                             <Col xs={12} sm={6} md={4} lg={3} xl={3} key={index}>
                                 <SectionCard
-                                    key={item.pk}
-                                    sectionId={item.pk || 0}
+                                    key={item.id}
+                                    sectionId={item.id || 0}
                                     imageUrl={item.imageUrl || ''}
                                     title={item.title}
                                     location={item.location || ''}
                                     date={item.date || ''}
-                                    plusButtonClickHandler={() => handleAddSection(item.pk)}
-                                    imageClickHandler={() => handleCardClick(item.pk)}
+                                    plusButtonClickHandler={() => handleAddSection(item.id)}
+                                    imageClickHandler={() => handleCardClick(item.id)}
                                 />
                             </Col>
                         ))}

@@ -8,7 +8,7 @@ import { NavigationBar } from "../components/NavBar";
 import { useSelector } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
 import { useAppDispatch, RootState } from '../redux/store';
-import { Section } from '../api/Api';
+import { SectionV2 } from '../graphql/graphql';
 import { DateDisplay } from '../helpers/DateDisplay';
 import { fetchSections, createSection } from "../redux/sectionsSlice";
 
@@ -37,7 +37,7 @@ const SectionsTablePage: FC = () => {
     };
 
     const handleAddButtonClick = () => {
-        const newSection: Section = {
+        const newSection: SectionV2 = {
             title: "Добавленная секция"
         };
         
@@ -95,8 +95,8 @@ const SectionsTablePage: FC = () => {
                                 </Row>
 
                                 {data.sections.map((item, _) => (
-                                    <Row key={item.pk} className="my-2 sections-table-page-row align-items-center">
-                                        <Col onClick={() => handleCardClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
+                                    <Row key={item.id} className="my-2 sections-table-page-row align-items-center">
+                                        <Col onClick={() => handleCardClick(item.id)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.id}</Col>
                                         <Col>{item.title}</Col>
                                         <Col>{item.location || '--'}</Col>
                                         <Col><DateDisplay dateString={item.date || ''}/></Col>

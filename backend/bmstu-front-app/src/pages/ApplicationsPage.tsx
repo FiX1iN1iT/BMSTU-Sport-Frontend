@@ -6,11 +6,11 @@ import { ROUTES, ROUTE_LABELS } from "../Routes";
 import { logoutUser } from "../redux/authSlice";
 import { NavigationBar } from "../components/NavBar";
 import { BreadCrumbs } from "../components/BreadCrumbs";
-import { SportApplication } from '../api/Api';
 import { DateDisplay } from '../helpers/DateDisplay';
 import { Container, Row, Spinner, Col } from "react-bootstrap";
 import { useAppDispatch, RootState } from '../redux/store';
 import { fetchApplications, changeStatus } from "../redux/applicationsSlice";
+import { SportApplicationV2 } from '../graphql/graphql';
 
 const ApplicationsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
@@ -20,7 +20,7 @@ const ApplicationsPage: FC = () => {
     const [endDate, setEndDate] = useState<string>('');
     const [status, setStatus] = useState<string>('');
 
-    const [filteredApplications, setFilteredApplications] = useState<SportApplication[]>([]);
+    const [filteredApplications, setFilteredApplications] = useState<SportApplicationV2[]>([]);
     const [creator, setCreator] = useState<string>('');
 
     const appDispatch = useAppDispatch();
@@ -52,8 +52,8 @@ const ApplicationsPage: FC = () => {
             setFilteredApplications(data.applications);
         } else {
             const filtered = data.applications.filter((applications) => {
-                if (applications.creator) {
-                    return applications.creator == creator
+                if (applications.user?.email) {
+                    return applications.user?.email == creator
                 } else {
                     return false
                 }
@@ -184,26 +184,26 @@ const ApplicationsPage: FC = () => {
                             </Row>
 
                             {filteredApplications.map((item, _) => (
-                                <Row key={item.pk} className="my-2 custom-row align-items-center">
-                                    <Col onClick={() => handleRowClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
+                                <Row key={item.id} className="my-2 custom-row align-items-center">
+                                    <Col onClick={() => handleRowClick(Number(item.id))} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.id}</Col>
 
                                     {user.is_staff ? (
                                         <Col>
-                                            <select value={item.status} onChange={(e) => handleApplicationStatusChange(item.pk, e.target.value)}>
-                                                <option value="created">Сформирована</option>
-                                                <option value="completed">Завершена</option>
-                                                <option value="rejected">Отклонена</option>
+                                            <select value={item.status} onChange={(e) => handleApplicationStatusChange(Number(item.id), e.target.value)}>
+                                                <option value="CREATED">Сформирована</option>
+                                                <option value="COMPLETED">Завершена</option>
+                                                <option value="REJECTED">Отклонена</option>
                                             </select>
                                         </Col>
                                     ) : (
-                                        <Col>{statusDictionary[item.status || 'created']}</Col>
+                                        <Col>{statusDictionary[item.status.toLowerCase() || 'created']}</Col>
                                     )}
 
-                                    <Col><DateDisplay dateString={item.creation_date || ''}/></Col>
-                                    <Col><DateDisplay dateString={item.apply_date || ''}/></Col>
-                                    <Col><DateDisplay dateString={item.end_date || ''}/></Col>
-                                    <Col>{item.creator}</Col>
-                                    <Col>{item.number_of_sections || '--'}</Col>
+                                    <Col><DateDisplay dateString={item.creationDate || ''}/></Col>
+                                    <Col><DateDisplay dateString={item.applyDate || ''}/></Col>
+                                    <Col><DateDisplay dateString={item.endDate || ''}/></Col>
+                                    <Col>{item.user?.email}</Col>
+                                    <Col>{item.numberOfSections || '--'}</Col>
                                 </Row>
                             ))}
                         </Container>

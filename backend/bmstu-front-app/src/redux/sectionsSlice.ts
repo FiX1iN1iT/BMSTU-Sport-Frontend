@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../api';
-import { Section } from '../api/Api';
+import client from '../graphql/client';
+import { SectionV2, FETCH_SECTIONS, CREATE_SECTION, ADD_SECTION_TO_DRAFT } from '../graphql/graphql';
 
 interface SectionsStateData {
-    sections: Section[];
+    sections: SectionV2[];
     draftApplicationID: number;
     applicationSectionsCounter: number;
 }
@@ -24,7 +24,10 @@ export const fetchSections = createAsyncThunk(
     'sections/fetchSections',
     async (searchValue: string | undefined, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsList({ section_title: searchValue });
+            const response = await client.query({
+                query: FETCH_SECTIONS,
+                variables: { sectionTitle: searchValue }
+            });
             return response.data
         } catch {
             return rejectWithValue('Не удалось получить список секций')
@@ -36,8 +39,11 @@ export const addSectionToDraft = createAsyncThunk(
     'sections/addSectionToDraft',
     async (sectionId: number, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsDraftCreate({section_id: sectionId});
-            return response.data
+            const response = await client.mutate({
+                mutation: ADD_SECTION_TO_DRAFT,
+                variables: { sectionId: Number(sectionId) },
+            });
+            return response.data.addSectionToDraft.response;
         } catch {
             return rejectWithValue('Не удалось добавить секцию к заявке-черновику')
         }
@@ -46,10 +52,13 @@ export const addSectionToDraft = createAsyncThunk(
 
 export const createSection = createAsyncThunk(
     'sections/createSection',
-    async (newSection: Section, { rejectWithValue }) => {
+    async (newSection: SectionV2, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsCreate(newSection);
-            return response.data
+            const response = await client.mutate({
+                mutation: CREATE_SECTION,
+                variables: { title: newSection.title }
+            });
+            return response.data.createSection.section;
         } catch {
             return rejectWithValue('Не удалось создать секцию')
         }
@@ -69,8 +78,8 @@ const sectionsSlice = createSlice({
             .addCase(fetchSections.fulfilled, (state, action) => {
                 const data = action.payload;
                 state.data.sections = data.sections;
-                state.data.applicationSectionsCounter = data.number_of_sections;
-                state.data.draftApplicationID = data.draft_application_id;
+                state.data.applicationSectionsCounter = data.numberOfSections;
+                state.data.draftApplicationID = data.draftApplicationId;
 
                 state.error = false
                 state.loading = false
@@ -82,8 +91,8 @@ const sectionsSlice = createSlice({
 
             .addCase(addSectionToDraft.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.applicationSectionsCounter = data.number_of_sections;
-                state.data.draftApplicationID = data.draft_application_id;
+                state.data.applicationSectionsCounter = data.numberOfSections;
+                state.data.draftApplicationID = data.draftApplicationId;
             })
             .addCase(addSectionToDraft.rejected, (state) => {
                 state.error = true

@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../api';
-import { Section } from '../api/Api';
+import client from '../graphql/client';
+import { SectionV2, FETCH_SECTION, UPDATE_SECTION, DELETE_SECTION } from '../graphql/graphql';
 
 interface SectionState {
-    data: Section | null;
+    data: SectionV2 | null;
     loading: boolean;
     error: boolean;
 }
@@ -18,8 +19,11 @@ export const fetchSection = createAsyncThunk(
     'section/fetchSection',
     async (sectionId: string, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsRead(sectionId);
-            return response.data
+            const response = await client.query({
+                query: FETCH_SECTION,
+                variables: { id: Number(sectionId) },
+            });
+            return response.data.section;
         } catch {
             return rejectWithValue('Не удалось получить секцию по id')
         }
@@ -28,10 +32,13 @@ export const fetchSection = createAsyncThunk(
 
 export const updateSection = createAsyncThunk(
     'section/updateSection',
-    async ({ sectionId, updatedSection }: { sectionId: string; updatedSection: Section }, { rejectWithValue }) => {
+    async (updatedSection: SectionV2, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsChangeUpdate(sectionId, { ...updatedSection });
-            return response.data
+            const response = await client.mutate({
+                mutation: UPDATE_SECTION,
+                variables: { ...updatedSection },
+            });
+            return response.data.updateSection.section;
         } catch {
             return rejectWithValue('Не удалось обновить секцию')
         }
@@ -42,8 +49,11 @@ export const deleteSection = createAsyncThunk(
     'section/deleteSection',
     async (sectionId: string, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsDeleteDelete(sectionId);
-            return response.data
+            const response = await client.mutate({
+                mutation: DELETE_SECTION,
+                variables: { id: Number(sectionId) },
+            });
+            return response.data.deleteSection.success;
         } catch {
             return rejectWithValue('Не удалось удалить секцию')
         }

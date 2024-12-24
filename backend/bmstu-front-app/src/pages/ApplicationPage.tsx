@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
 import { useAppDispatch, RootState } from '../redux/store';
 import { fetchApplication, increasePriority, removeSection, changeFullName, deleteApplication, submitApplication } from "../redux/applicationSlice";
-import { SportApplication } from "../api/Api";
+import { SportApplicationV2 } from '../graphql/graphql';
 
 const ApplicationPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
@@ -25,9 +25,13 @@ const ApplicationPage: FC = () => {
 
     useEffect(() => {
         if (!id) return;
-        appDispatch(fetchApplication(id));
-        setFullName(data.applicaiton?.full_name || '');
+        appDispatch(fetchApplication(Number(id)));
+        setFullName(data.applicaiton?.fullName || '');
     }, [appDispatch, id]);
+
+    useEffect(() => {
+        setFullName(data.applicaiton?.fullName || '');
+    }, [data]);
   
     const handleCardClick = (sectionId: number | undefined) => {
         if (!sectionId) return;
@@ -36,27 +40,27 @@ const ApplicationPage: FC = () => {
 
     const handleArrowClick = (sectionId: number | undefined) => {
         if (!id || !sectionId) return;
-        appDispatch(increasePriority({ applicationId: id, sectionId: String(sectionId) }));
+        appDispatch(increasePriority({ applicationId: Number(id), sectionId: Number(sectionId) }));
     };
 
     const handleMinusClick = (sectionId: number | undefined) => {
         if (!id || !sectionId) return;
-        appDispatch(removeSection({ applicationId: id, sectionId: String(sectionId) }));
+        appDispatch(removeSection({ applicationId: Number(id), sectionId: Number(sectionId) }));
     };
 
     const handleFieldSubmit = () => {
         if (!id) return;
 
-        var updatedApplication = { ...data.applicaiton } as SportApplication;
+        var updatedApplication = { ...data.applicaiton } as SportApplicationV2;
         if (!updatedApplication) return;
-        updatedApplication.full_name = fullName;
-        appDispatch(changeFullName({ applicationId: id, updatedApplication: updatedApplication }));
+        updatedApplication.fullName = fullName;
+        appDispatch(changeFullName({ applicationId: Number(id), updatedApplication: updatedApplication }));
     };
 
     const handleDeleteButtonClick = () => {
         if (!id) return;
 
-        appDispatch(deleteApplication(id));
+        appDispatch(deleteApplication(Number(id)));
 
         navigate(ROUTES.APPLICATIONS);
     };
@@ -64,7 +68,7 @@ const ApplicationPage: FC = () => {
     const handleSubmitButtonClick = () => {
         if (!id) return;
 
-        appDispatch(submitApplication(id));
+        appDispatch(submitApplication(Number(id)));
 
         navigate(ROUTES.APPLICATIONS);
     };
@@ -117,15 +121,15 @@ const ApplicationPage: FC = () => {
                                 {data.sections.map((item, index) => (
                                     <Col key={index} xs={12}>
                                         <ApplicationRow
-                                            key={item.pk}
+                                            key={item.id}
                                             imageUrl={item.imageUrl || ''}
                                             title={item.title}
                                             location={item.location || ''}
                                             date={item.date || ''}
                                             position={index + 1}
-                                            imageClickHandler={() => handleCardClick(item.pk)}
-                                            handleArrowClick={() => handleArrowClick(item.pk)}
-                                            handleMinusClick={() => handleMinusClick(item.pk)}
+                                            imageClickHandler={() => handleCardClick(item.id)}
+                                            handleArrowClick={() => handleArrowClick(item.id)}
+                                            handleMinusClick={() => handleMinusClick(item.id)}
                                         />
                                     </Col>
                                 ))}

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Form, Container, Alert, Row, Col, Image } from 'react-bootstrap';
-import { Section } from '../api/Api';
 import { ROUTES } from '../Routes';
 import { useSelector } from "react-redux";
 import { useAppDispatch, RootState } from '../redux/store';
 import { fetchSection, updateSection, updateSectionImage, deleteSection } from "../redux/sectionSlice";
+import { SectionV2 } from '../graphql/graphql';
 
 const SectionEditPage = () => {
     const { data, loading, error } = useSelector((state: RootState) => state.section);
 
-    const [formData, setFormData] = useState<Section | null>(null);
+    const [formData, setFormData] = useState<SectionV2 | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -53,9 +53,8 @@ const SectionEditPage = () => {
 
     const handleSubmit = async () => {
         if (!id || !formData || !data) return;
-        
-        appDispatch(updateSection({ sectionId: id, updatedSection: formData }));
-        navigate(ROUTES.SECTIONS);
+        formData.id = Number(formData.id);
+        appDispatch(updateSection(formData));
     };
 
     const handleDelete = async () => {

@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../api';
-import { Section, SportApplication } from '../api/Api';
+import client from '../graphql/client';
+import { SportApplicationV2, SectionV2, FETCH_APPLICATION, UPDATE_APPLICATION, DELETE_APPLICATION, SUBMIT_APPLICATION, REMOVE_SECTION, INCREASE_PRIORITY } from '../graphql/graphql';
 
 interface ApplicationStateData {
-    sections: Section[];
-    applicaiton: SportApplication | null;
+    sections: SectionV2[];
+    applicaiton: SportApplicationV2 | null;
 }
 
 interface ApplicationState {
@@ -21,10 +21,13 @@ const initialState: ApplicationState = {
 
 export const fetchApplication = createAsyncThunk(
     'application/fetchApplication',
-    async (applicationId: string, { rejectWithValue }) => {
+    async (applicationId: number, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsRead(applicationId);
-            return response.data
+            const response = await client.query({
+                query: FETCH_APPLICATION,
+                variables: { applicationId },
+            });
+            return response.data;
         } catch {
             return rejectWithValue('Не удалось получить заявку по id')
         }
@@ -33,10 +36,13 @@ export const fetchApplication = createAsyncThunk(
 
 export const increasePriority = createAsyncThunk(
     'application/increasePriority',
-    async ({ applicationId, sectionId }: { applicationId: string; sectionId: string }, { rejectWithValue }) => {
+    async ({ applicationId, sectionId }: { applicationId: number; sectionId: number }, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsPriorityUpdate(applicationId, sectionId);
-            return response.data
+            const response = await client.mutate({
+                mutation: INCREASE_PRIORITY,
+                variables: { applicationId, sectionId },
+            });
+            return response.data.increasePriority.sectionsByApplication;
         } catch {
             return rejectWithValue('Не удалось получить увеличить приоритет секции')
         }
@@ -45,10 +51,13 @@ export const increasePriority = createAsyncThunk(
 
 export const removeSection = createAsyncThunk(
     'application/removeSection',
-    async ({ applicationId, sectionId }: { applicationId: string; sectionId: string }, { rejectWithValue }) => {
+    async ({ applicationId, sectionId }: { applicationId: number; sectionId: number }, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsPriorityDelete(applicationId, sectionId);
-            return response.data
+            const response = await client.mutate({
+                mutation: REMOVE_SECTION,
+                variables: { applicationId, sectionId },
+            });
+            return response.data.removeSection.sectionsByApplication;
         } catch {
             return rejectWithValue('Не удалось удалить секцию из заявки')
         }
@@ -57,10 +66,13 @@ export const removeSection = createAsyncThunk(
 
 export const changeFullName = createAsyncThunk(
     'application/changeFullName',
-    async ({ applicationId, updatedApplication }: { applicationId: string; updatedApplication: SportApplication }, { rejectWithValue }) => {
+    async ({ applicationId, updatedApplication }: { applicationId: number; updatedApplication: SportApplicationV2 }, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsUpdate(applicationId, updatedApplication);
-            return response.data
+            const response = await client.mutate({
+                mutation: UPDATE_APPLICATION,
+                variables: { applicationId, input: { fullName: updatedApplication.fullName } },
+            });
+            return response.data.updateApplication.application;
         } catch {
             return rejectWithValue('Не удалось изменить ФИО в заявке')
         }
@@ -69,10 +81,13 @@ export const changeFullName = createAsyncThunk(
 
 export const deleteApplication = createAsyncThunk(
     'application/deleteApplication',
-    async (applicationId: string, { rejectWithValue }) => {
+    async (applicationId: number, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsDelete(applicationId);
-            return response.data
+            const response = await client.mutate({
+                mutation: DELETE_APPLICATION,
+                variables: { applicationId },
+            });
+            return response.data.deleteApplication.success;
         } catch {
             return rejectWithValue('Не удалось удалить заявку')
         }
@@ -81,10 +96,13 @@ export const deleteApplication = createAsyncThunk(
 
 export const submitApplication = createAsyncThunk(
     'application/submitApplication',
-    async (applicationId: string, { rejectWithValue }) => {
+    async (applicationId: number, { rejectWithValue }) => {
         try {
-            const response = await api.applications.applicationsSubmitUpdate(applicationId);
-            return response.data
+            const response = await client.mutate({
+                mutation: SUBMIT_APPLICATION,
+                variables: { applicationId },
+            });
+            return response.data.submitApplication.success;
         } catch {
             return rejectWithValue('Не удалось сформировать заявку')
         }
@@ -103,8 +121,8 @@ const applicationSlice = createSlice({
             })
             .addCase(fetchApplication.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.sections = data.sections;
-                state.data.applicaiton = data.application;
+                state.data.sections = data.sectionsByApplication;
+                state.data.applicaiton = data.applicationDetail;
 
                 state.error = false
                 state.loading = false
@@ -116,7 +134,7 @@ const applicationSlice = createSlice({
 
             .addCase(increasePriority.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.sections = data.sections;
+                state.data.sections = data;
             })
             .addCase(increasePriority.rejected, (state) => {
                 state.error = true
@@ -124,7 +142,7 @@ const applicationSlice = createSlice({
 
             .addCase(removeSection.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.sections = data.sections;
+                state.data.sections = data;
             })
             .addCase(removeSection.rejected, (state) => {
                 state.error = true
@@ -132,7 +150,7 @@ const applicationSlice = createSlice({
 
             .addCase(changeFullName.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.applicaiton = data;
+                state.data.applicaiton = data.application;
             })
             .addCase(changeFullName.rejected, (state) => {
                 state.error = true
