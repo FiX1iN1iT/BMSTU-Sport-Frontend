@@ -104,6 +104,7 @@ export const UPDATE_SECTION = gql`
                 date
                 instructor
                 duration
+                imageUrl
             }
         }
     }
