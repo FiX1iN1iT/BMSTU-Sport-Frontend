@@ -64,8 +64,11 @@ const ApplicationPage: FC = () => {
     const handleSubmitButtonClick = () => {
         if (!id) return;
 
+        if (!data.applicaiton?.full_name) {
+            alert('Заполните ФИО для формирования заявки');
+            return;
+        }
         appDispatch(submitApplication(id));
-
         navigate(ROUTES.APPLICATIONS);
     };
 
