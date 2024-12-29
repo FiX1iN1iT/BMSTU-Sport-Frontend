@@ -11,6 +11,7 @@ import { DateDisplay } from '../helpers/DateDisplay';
 import { Container, Row, Spinner, Col } from "react-bootstrap";
 import { useAppDispatch, RootState } from '../redux/store';
 import { fetchApplications, changeStatus } from "../redux/applicationsSlice";
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const ApplicationsPage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
@@ -182,30 +183,51 @@ const ApplicationsPage: FC = () => {
                                 <Col>Создатель</Col>
                                 <Col>ФИО</Col>
                                 <Col>Кол-во ауд.</Col>
+                                {user.is_staff && (
+                                    <>
+                                        <Col>Одобрить</Col>
+                                        <Col>Отклонить</Col>
+                                    </>
+                                )}
                             </Row>
 
                             {filteredApplications.map((item, _) => (
                                 <Row key={item.pk} className="my-2 custom-row align-items-center">
                                     <Col onClick={() => handleRowClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
-
-                                    {user.is_staff ? (
-                                        <Col>
-                                            <select value={item.status} onChange={(e) => handleApplicationStatusChange(item.pk, e.target.value)}>
-                                                <option value="created">Сформирована</option>
-                                                <option value="completed">Завершена</option>
-                                                <option value="rejected">Отклонена</option>
-                                            </select>
-                                        </Col>
-                                    ) : (
-                                        <Col>{statusDictionary[item.status || 'created']}</Col>
-                                    )}
-
+                                    <Col>{statusDictionary[item.status.toLowerCase() || 'created']}</Col>
                                     <Col><DateDisplay dateString={item.creation_date || ''}/></Col>
                                     <Col><DateDisplay dateString={item.apply_date || ''}/></Col>
                                     <Col><DateDisplay dateString={item.end_date || ''}/></Col>
                                     <Col>{item.creator}</Col>
                                     <Col>{item.full_name || '--'}</Col>
                                     <Col>{item.number_of_sections || '--'}</Col>
+
+                                    {user.is_staff && (
+                                        <>
+                                        <Col>
+                                            <FaCheck
+                                                style={{
+                                                    color: item.status.toLowerCase() === 'created' ? 'green' : 'gray',
+                                                    cursor: item.status.toLowerCase() === 'created' ? 'pointer' : 'not-allowed',
+                                                }}
+                                                onClick={() => {
+                                                    if (item.status.toLowerCase() === 'created') handleApplicationStatusChange(item.pk, 'completed');
+                                                }}
+                                            />
+                                        </Col>
+                                        <Col>
+                                            <FaTimes
+                                                style={{
+                                                    color: item.status.toLowerCase() === 'created' ? 'red' : 'gray',
+                                                    cursor: item.status.toLowerCase() === 'created' ? 'pointer' : 'not-allowed',
+                                                }}
+                                                onClick={() => {
+                                                    if (item.status.toLowerCase() === 'created') handleApplicationStatusChange(item.pk, 'rejected');
+                                                }}
+                                            />
+                                        </Col>
+                                        </>
+                                    )}
                                 </Row>
                             ))}
                         </Container>
