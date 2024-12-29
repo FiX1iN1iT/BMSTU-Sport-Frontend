@@ -180,6 +180,7 @@ const ApplicationsPage: FC = () => {
                                 <Col>Дата формирования</Col>
                                 <Col>Дата завершения</Col>
                                 <Col>Создатель</Col>
+                                <Col>ФИО</Col>
                                 <Col>Кол-во ауд.</Col>
                             </Row>
 
@@ -203,6 +204,7 @@ const ApplicationsPage: FC = () => {
                                     <Col><DateDisplay dateString={item.apply_date || ''}/></Col>
                                     <Col><DateDisplay dateString={item.end_date || ''}/></Col>
                                     <Col>{item.creator}</Col>
+                                    <Col>{item.full_name || '--'}</Col>
                                     <Col>{item.number_of_sections || '--'}</Col>
                                 </Row>
                             ))}
