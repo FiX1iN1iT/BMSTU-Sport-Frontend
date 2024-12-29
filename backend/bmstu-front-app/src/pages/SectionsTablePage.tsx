@@ -87,6 +87,7 @@ const SectionsTablePage: FC = () => {
                             <Container fluid>
                                 <Row>
                                     <Col>#</Col>
+                                    <Col>Изображение</Col>
                                     <Col>Название</Col>
                                     <Col>Место</Col>
                                     <Col>Дата</Col>
@@ -97,6 +98,13 @@ const SectionsTablePage: FC = () => {
                                 {data.sections.map((item, _) => (
                                     <Row key={item.pk} className="my-2 sections-table-page-row align-items-center">
                                         <Col onClick={() => handleCardClick(item.pk)} style={{ cursor: "pointer", textDecoration: 'underline', color: 'blue' }}>{item.pk}</Col>
+                                        <Col>
+                                            {item.imageUrl ? (
+                                                <img src={item.imageUrl} alt="section" style={{ maxWidth: "100px", maxHeight: "50px" }} />
+                                            ) : (
+                                                '--'
+                                            )}
+                                        </Col>
                                         <Col>{item.title}</Col>
                                         <Col>{item.location || '--'}</Col>
                                         <Col><DateDisplay dateString={item.date || ''}/></Col>
