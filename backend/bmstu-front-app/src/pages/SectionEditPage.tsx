@@ -5,7 +5,7 @@ import { Section } from '../api/Api';
 import { ROUTES } from '../Routes';
 import { useSelector } from "react-redux";
 import { useAppDispatch, RootState } from '../redux/store';
-import { fetchSection, updateSection, updateSectionImage, deleteSection } from "../redux/sectionSlice";
+import { fetchSection, updateSection, updateSectionImage, createSection } from "../redux/sectionSlice";
 
 const SectionEditPage = () => {
     const { data, loading, error } = useSelector((state: RootState) => state.section);
@@ -19,12 +19,12 @@ const SectionEditPage = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        if (!id) return;
+        if (!id || id == '0') return;
         appDispatch(fetchSection(id));
     }, [appDispatch, id]);
 
     useEffect(() => {
-        if (!data) return;
+        if (!data || id == '0') return;
         setFormData(data);
         setImagePreview(data.imageUrl || null);
     }, [data]);
@@ -52,17 +52,22 @@ const SectionEditPage = () => {
     };
 
     const handleSubmit = async () => {
+        if (id == '0' && formData) {
+            if (!formData.title || !formData.date || !formData.description || !formData.duration || !formData.instructor || !formData.location) {
+                alert('Заполните все поля');
+                return;
+            }
+            appDispatch(createSection(formData));
+            navigate(ROUTES.SECTIONSTABLE);
+            return;
+        } else {
+            alert('Заполните все поля');
+        }
+
         if (!id || !formData || !data) return;
         
         appDispatch(updateSection({ sectionId: id, updatedSection: formData }));
         navigate(ROUTES.SECTIONS);
-    };
-
-    const handleDelete = async () => {
-        if (!id || !data) return;
-
-        appDispatch(deleteSection(id));
-        navigate(ROUTES.SECTIONSTABLE);
     };
 
     const handleImageUpdate = async () => {
@@ -73,7 +78,7 @@ const SectionEditPage = () => {
     };  
 
 
-    if (loading) {
+    if (loading && id != '0') {
         return <div>Загрузка...</div>;
     }
 
@@ -81,7 +86,7 @@ const SectionEditPage = () => {
         return <Alert variant="danger">Ошибка!</Alert>;
     }
 
-    if (!data) {
+    if (!data && id != '0') {
         return <div>Элемент не найден.</div>;
     }
 
@@ -158,30 +163,32 @@ const SectionEditPage = () => {
                 </Col>
                 </Row>
 
-                <Form.Group controlId="image" className="mt-3">
-                <Form.Label>Изображение</Form.Label>
-                <Form.Control
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                />
-                {imagePreview ? (
-                    <Image 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    fluid
-                    style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
-                    />
-                ) : (
-                    <Image 
-                    src={data?.imageUrl || ''} 
-                    alt="Preview" 
-                    fluid
-                    style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
-                    />
+                {id != '0' && (
+                    <Form.Group controlId="image" className="mt-3">
+                        <Form.Label>Изображение</Form.Label>
+                        <Form.Control
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                        />
+                        {imagePreview ? (
+                            <Image 
+                            src={imagePreview} 
+                            alt="Preview" 
+                            fluid
+                            style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
+                            />
+                        ) : (
+                            <Image 
+                            src={data?.imageUrl || ''} 
+                            alt="Preview" 
+                            fluid
+                            style={{ maxWidth: '400px', maxHeight: '400px', marginTop: '10px' }}
+                            />
+                        )}
+                    </Form.Group>
                 )}
-                </Form.Group>
 
                 <Form.Group controlId="description" className="mt-3">
                 <Form.Label>Описание</Form.Label>
@@ -199,14 +206,11 @@ const SectionEditPage = () => {
                     <Button variant="danger" onClick={handleSubmit}>
                         Сохранить изменения
                     </Button>
-                    {imageFile && (
+                    {imageFile && id != '0' && (
                         <Button variant="danger" onClick={handleImageUpdate}>
                             Обновить изображение
                         </Button>
                     )}
-                    <Button variant="outline-danger" onClick={handleDelete}>
-                        Удалить
-                    </Button>
                     <Button variant="light" onClick={() => navigate(ROUTES.SECTIONSTABLE)}>
                         Отмена
                     </Button>

@@ -44,14 +44,14 @@ export const addSectionToDraft = createAsyncThunk(
     }
 );
 
-export const createSection = createAsyncThunk(
-    'sections/createSection',
-    async (newSection: Section, { rejectWithValue }) => {
+export const deleteSection = createAsyncThunk(
+    'sections/deleteSection',
+    async (sectionId: string, { rejectWithValue }) => {
         try {
-            const response = await api.sections.sectionsCreate(newSection);
+            const response = await api.sections.sectionsDeleteDelete(sectionId);
             return response.data
         } catch {
-            return rejectWithValue('Не удалось создать секцию')
+            return rejectWithValue('Не удалось удалить секцию')
         }
     }
 );
@@ -89,11 +89,12 @@ const sectionsSlice = createSlice({
                 state.error = true
             })
 
-            .addCase(createSection.fulfilled, (state, action) => {
+            .addCase(deleteSection.fulfilled, (state, action) => {
                 const data = action.payload;
-                state.data.sections = [...state.data.sections, data];
+                state.data.sections = data;
+                state.error = false
             })
-            .addCase(createSection.rejected, (state) => {
+            .addCase(deleteSection.rejected, (state) => {
                 state.error = true
             })
     }

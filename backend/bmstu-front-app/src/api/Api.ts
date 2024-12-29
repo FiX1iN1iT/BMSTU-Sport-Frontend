@@ -751,7 +751,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     sectionsDeleteDelete: (sectionId: string, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Section[], any>({
         path: `/sections/${sectionId}/delete/`,
         method: "DELETE",
         secure: true,

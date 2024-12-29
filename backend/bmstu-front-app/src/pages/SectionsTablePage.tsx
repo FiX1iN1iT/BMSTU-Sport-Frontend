@@ -8,9 +8,9 @@ import { NavigationBar } from "../components/NavBar";
 import { useSelector } from "react-redux";
 import { logoutUser } from "../redux/authSlice";
 import { useAppDispatch, RootState } from '../redux/store';
-import { Section } from '../api/Api';
 import { DateDisplay } from '../helpers/DateDisplay';
-import { fetchSections, createSection } from "../redux/sectionsSlice";
+import { fetchSections, deleteSection } from "../redux/sectionsSlice";
+import { FaTrash } from 'react-icons/fa';
 
 const SectionsTablePage: FC = () => {
     const { isAuthenticated, user } = useSelector((state: any) => state.auth);
@@ -36,12 +36,14 @@ const SectionsTablePage: FC = () => {
         if (id) navigate(`${ROUTES.SECTIONSTABLE}/${id}`);
     };
 
+    const handleDelete = (id: number | undefined) => {
+        if (!id) return;
+
+        appDispatch(deleteSection(String(id)));
+    };
+
     const handleAddButtonClick = () => {
-        const newSection: Section = {
-            title: "Добавленная секция"
-        };
-        
-        appDispatch(createSection(newSection));
+        navigate(`${ROUTES.SECTIONSTABLE}/0`);
     };
 
     const handleLogout = async () => {
@@ -93,6 +95,7 @@ const SectionsTablePage: FC = () => {
                                     <Col>Дата</Col>
                                     <Col>Преподаватель</Col>
                                     <Col>Продолжительность</Col>
+                                    <Col>Удалить</Col>
                                 </Row>
 
                                 {data.sections.map((item, _) => (
@@ -110,6 +113,12 @@ const SectionsTablePage: FC = () => {
                                         <Col><DateDisplay dateString={item.date || ''}/></Col>
                                         <Col>{item.instructor || '--'}</Col>
                                         <Col>{item.duration || '--'} мин</Col>
+                                        <Col>
+                                            <FaTrash
+                                                style={{ color: 'red' }}
+                                                onClick={() => { handleDelete(item.pk); }}
+                                            />
+                                        </Col>
                                     </Row>
                                 ))}
                             </Container>

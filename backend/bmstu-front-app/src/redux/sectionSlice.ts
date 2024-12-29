@@ -4,12 +4,14 @@ import { Section } from '../api/Api';
 
 interface SectionState {
     data: Section | null;
+    newSectionId: number | null;
     loading: boolean;
     error: boolean;
 }
 
 const initialState: SectionState = {
     data: null,
+    newSectionId: null,
     loading: true,
     error: false
 };
@@ -38,18 +40,6 @@ export const updateSection = createAsyncThunk(
     }
 );
 
-export const deleteSection = createAsyncThunk(
-    'section/deleteSection',
-    async (sectionId: string, { rejectWithValue }) => {
-        try {
-            const response = await api.sections.sectionsDeleteDelete(sectionId);
-            return response.data
-        } catch {
-            return rejectWithValue('Не удалось удалить секцию')
-        }
-    }
-);
-
 export const updateSectionImage = createAsyncThunk(
     'section/updateSectionImage',
     async ({ sectionId, imageFile }: { sectionId: string; imageFile: File }, { rejectWithValue }) => {
@@ -58,6 +48,18 @@ export const updateSectionImage = createAsyncThunk(
             return response.data
         } catch {
             return rejectWithValue('Не удалось обновить изображение секции')
+        }
+    }
+);
+
+export const createSection = createAsyncThunk(
+    'section/createSection',
+    async (newSection: Section, { rejectWithValue }) => {
+        try {
+            const response = await api.sections.sectionsCreate(newSection);
+            return response.data
+        } catch {
+            return rejectWithValue('Не удалось создать секцию')
         }
     }
 );
@@ -90,18 +92,19 @@ const sectionSlice = createSlice({
                 state.error = true
             })
 
-            .addCase(deleteSection.fulfilled, (state) => {
-                state.data = null;
-                state.error = false
-            })
-            .addCase(deleteSection.rejected, (state) => {
-                state.error = true
-            })
-
             .addCase(updateSectionImage.fulfilled, (state) => {
                 state.error = false
             })
             .addCase(updateSectionImage.rejected, (state) => {
+                state.error = true
+            })
+
+            .addCase(createSection.fulfilled, (state, action) => {
+                const data = action.payload;
+                state.newSectionId = Number(data.pk);
+                state.error = false
+            })
+            .addCase(createSection.rejected, (state) => {
                 state.error = true
             })
     }
